@@ -261,12 +261,13 @@ if(cur==='speed'){
   x.fillStyle='#fff'; x.textAlign='center'; x.font='900 12px system-ui';
   x.fillText('0 km',30,H/2+10); x.fillText(d+' km',W-30,H/2+10);
   x.font='900 24px system-ui'; x.fillText('🏁',W-30,H/2-10);
-    x.save();
-  x.translate(carX, H/2+30);
-  x.scale(-1, 1);
-  x.font='900 36px system-ui'; x.textAlign='center';
-  x.fillText('🚗', 0, 0);
-  x.restore();
+    // DRAWN CAR - RED, faces RIGHT, small white headlight
+  x.fillStyle='#ef4444'; x.fillRect(carX-28, H/2+2, 56, 18);
+  x.fillStyle='#ef4444'; x.fillRect(carX-14, H/2-12, 30, 14);
+  x.fillStyle='#dbeafe'; x.fillRect(carX-8, H/2-10, 18, 10);
+  x.fillStyle='#111'; x.beginPath(); x.arc(carX-16, H/2+20, 8, 0, 6.3); x.arc(carX+16, H/2+20, 8, 0, 6.3); x.fill();
+  x.fillStyle='#fff'; x.beginPath(); x.arc(carX+24, H/2+10, 3, 0, 6.3); x.fill();
+  x.fillStyle='#7f1d1d'; x.fillRect(carX-30, H/2+6, 4, 6);
   x.fillStyle='#fff'; x.font='900 16px system-ui';
   x.fillText(d+'km ÷ '+t+'h = '+sp.toFixed(0)+' km/h',W/2,30);
   x.fillStyle= sp<30 ? '#22c55e' : sp<60 ? '#facc15' : '#ef4444';
