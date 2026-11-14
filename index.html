@@ -261,8 +261,12 @@ if(cur==='speed'){
   x.fillStyle='#fff'; x.textAlign='center'; x.font='900 12px system-ui';
   x.fillText('0 km',30,H/2+10); x.fillText(d+' km',W-30,H/2+10);
   x.font='900 24px system-ui'; x.fillText('🏁',W-30,H/2-10);
+    x.save();
+  x.translate(carX, H/2+30);
+  x.scale(-1, 1);
   x.font='900 36px system-ui'; x.textAlign='center';
-  x.fillText('🚗',carX,H/2+30);
+  x.fillText('🚗', 0, 0);
+  x.restore();
   x.fillStyle='#fff'; x.font='900 16px system-ui';
   x.fillText(d+'km ÷ '+t+'h = '+sp.toFixed(0)+' km/h',W/2,30);
   x.fillStyle= sp<30 ? '#22c55e' : sp<60 ? '#facc15' : '#ef4444';
