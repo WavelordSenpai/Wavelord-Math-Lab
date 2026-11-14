@@ -347,7 +347,23 @@ function tSide(h){let s=$('sidebar');h?s.classList.add('hidden'):s.classList.tog
 function toast(m,ms){let t=$('toast');t.innerText=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',ms||4000)}
 onerror=(m,s,l)=>toast('⚠ '+m+' (line '+l+')',9000);
 function openBuddy(){let o=$('cp').classList.toggle('open');$('choice').classList.remove('open');if(o){let t=T[cur];$('cans').innerText='You are on: '+t.n+'\n'+(t.explain||'')}} 
-function askBuddy(){let q=$('cask').value.toLowerCase(),t=T[cur],a='On '+t.n+': '+(t.explain||'')+'\n\nWhy? '+(t.why||'')+'\n\nJargon: '+(t.jargon||'');if(q.includes('why'))a=t.why;if(q.includes('real')||q.includes('example')||q.includes('who'))a=t.real;if(q.includes('formula'))a=t.eq;if(q.includes('jargon')||q.includes('mean')||q.includes('what is')||q.includes('theta')||q.includes('sin')||q.includes('cos')||q.includes('volume')||q.includes('radius')||q.includes('node')||q.includes('prime')||q.includes('percent'))a=t.jargon;if(q.includes('quiz')){if(t.q){newQ();a='Try this: '+(ch?ch[0]:'')}else a='No quiz for this topic. Try Addition!'} $('cans').innerText=a;$('cask').value=''}
+async function askBuddy(){
+  const q = $('cask').value || "explain this topic";
+  $('cans').innerText = "Thinking...";
+  try {
+    const r = await fetch("/.netlify/functions/math-buddy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        persona: "buddy",
+        question: q,
+        topic: cur + " - " + T[cur].eq
+      })
+    });
+    const d = await r.json();
+    $('cans').innerText = d.answer || d.error || "No answer";
+  } catch(e){ $('cans').innerText = "Error: " + e.message; }
+	}
 function openChoice(){$('choice').classList.toggle('open');$('cp').classList.remove('open');$('fcalc').classList.remove('open')}
 function calcOpen(){$('fcalc').classList.toggle('open');$('choice').classList.remove('open')}
 function minApp(){$('main').style.display='none';$('sidebar').classList.add('hidden');$('collapsed').classList.add('show');$('fcalc').classList.remove('open');$('choice').classList.remove('open');$('cp').classList.remove('open')}
