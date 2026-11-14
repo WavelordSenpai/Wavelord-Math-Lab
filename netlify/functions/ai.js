@@ -1,6 +1,6 @@
-// Netlify Function - Wavelord MATH LAB V42
-// Needs env var in Netlify: GROQ_API_KEY
-// Model: openai/gpt-oss-20b - NOT llama
+// Netlify Function - Wavelord MATH LAB - UNLOCKED AI
+// Env var: GROQ_API_KEY
+// Model: openai/gpt-oss-20b
 
 exports.handler = async (event) => {
   const headers = {
@@ -8,22 +8,18 @@ exports.handler = async (event) => {
     "Access-Control-Allow-Headers": "Content-Type",
     "Content-Type": "application/json",
   };
-
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers, body: "" };
   }
-
   try {
     const { persona, question, topic } = JSON.parse(event.body || "{}");
     if (!question) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: "No question" }) };
     }
-
     const isBuddy = persona === "buddy";
-
     const systemPrompt = isBuddy
-      ? `You are ∑ Math Buddy, a warm friendly buddy in the Wavelord Math Lab app. You explain maths simply, with real life examples, like money, pizza, shop, temperature. Be encouraging, funny, kind, like a best friend. Keep replies short, 2-4 sentences, easy to read on a phone. User is on topic: ${topic || "Math Lab"}. Never talk about Library, Wave Crystal, or surfing. Only maths.`
-      : `You are the Math Teacher in Wavelord Math Lab. Explain clearly with WORKING, step-by-step. Use topics from the app: Addition, Subtraction, Multiplication, Division, Negatives, Unit Circle, Euler e, Sine Wave, Pythagoras, Formulas. Keep it clear, 3-5 short paragraphs max. Give one real life example and one try-this. No Library, no Crystal, no surfing. User is on topic: ${topic || "Math Lab"}.`;
+      ? `You are ∑ Math Buddy, a warm friendly best-friend AI in the Wavelord Math Lab app. You can answer ANYTHING - maths, science, homework, life, jokes, stories, coding, history, anything the user asks. Be encouraging, funny, kind. Keep replies short, 2-4 sentences, easy to read on a phone. If it's maths, use real life examples like money, pizza, shop. User is on topic: ${topic || "General"}.`
+      : `You are the Teacher in Wavelord Math Lab. You can answer ANYTHING - maths, science, school, life, general knowledge. Explain clearly with WORKING and step-by-step when it helps. Give one real life example and one try-this when it fits. Keep it clear, 3-5 short paragraphs max. User is on topic: ${topic || "General"}.`;
 
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -38,14 +34,13 @@ exports.handler = async (event) => {
           { role: "user", content: question },
         ],
         temperature: 0.7,
-        max_tokens: 500,
+        max_tokens: 800,
       }),
     });
-
     const data = await res.json();
-    const answer = data?.choices?.[0]?.message?.content || "Math Buddy is quiet right now, try again.";
+    const answer = data?.choices?.[0]?.message?.content || "I'm quiet right now, try again.";
     return { statusCode: 200, headers, body: JSON.stringify({ answer }) };
   } catch (e) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: "Math Buddy couldn't reach Netlify: " + e.message }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: "AI couldn't reach Netlify: " + e.message }) };
   }
 };
