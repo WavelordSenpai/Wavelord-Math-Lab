@@ -375,5 +375,49 @@ function cLive(){let s=$('cin').value.trim();if(!s){$('cres').innerText='';retur
 cLive();buildF();
 if(innerWidth<=700)$('sidebar').classList.add('hidden');
 select('add');loop();
+	// --- DRAGGABLE - cw = Math Buddy, ww = Waiter ---
+function makeDraggable(el){
+  if(!el || el.dataset.dragReady) return;
+  el.dataset.dragReady = "1";
+  el.style.touchAction = "none";
+  el.style.cursor = "grab";
+  let sx=0, sy=0, ox=0, oy=0, dragging=false, moved=false;
+
+  el.addEventListener('pointerdown', e=>{
+    dragging=true; moved=false;
+    sx=e.clientX; sy=e.clientY;
+    const r=el.getBoundingClientRect();
+    ox=r.left; oy=r.top;
+    el.style.left=ox+'px'; el.style.top=oy+'px';
+    el.style.right='auto'; el.style.bottom='auto';
+    try{ el.setPointerCapture(e.pointerId); }catch(err){}
+  });
+
+  el.addEventListener('pointermove', e=>{
+    if(!dragging) return;
+    const dx=e.clientX-sx, dy=e.clientY-sy;
+    if(Math.abs(dx)>6 || Math.abs(dy)>6) moved=true;
+    if(moved){
+      el.style.left=(ox+dx)+'px';
+      el.style.top=(oy+dy)+'px';
+    }
+  });
+
+  const stop = ()=>{
+    dragging=false;
+    // keep moved=true for a tiny bit so the click doesn't open the popup
+    if(moved) setTimeout(()=>{ moved=false; }, 150);
+  };
+  el.addEventListener('pointerup', stop);
+  el.addEventListener('pointercancel', stop);
+
+  // THIS is the key part - block the inner button's onclick after a drag
+  el.addEventListener('click', e=>{
+    if(moved){ e.stopPropagation(); e.preventDefault(); }
+  }, true);
+}
+
+makeDraggable(document.getElementById('cw')); // Math Buddy
+makeDraggable(document.getElementById('ww')); // Waiter / Calculator bubble
 </script>
 </body></html>
