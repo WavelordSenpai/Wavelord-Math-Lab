@@ -24,6 +24,19 @@ jobs:
           npx cap init "Wavelord Math Lab" com.wavelord.mathlab --web-dir=www || true
           if [ ! -d android ]; then npx cap add android || true; fi
           npx cap sync android
+          python3 -c "
+          from PIL import Image
+          import os
+          src = 'icon-512.png' if os.path.exists('icon-512.png') else 'icon-192.png'
+          sizes = {'mipmap-mdpi':48,'mipmap-hdpi':72,'mipmap-xhdpi':96,'mipmap-xxhdpi':144,'mipmap-xxxhdpi':192}
+          im = Image.open(src).convert('RGB')
+          for folder, size in sizes.items():
+              p = f'android/app/src/main/res/{folder}'
+              os.makedirs(p, exist_ok=True)
+              im.resize((size, size), Image.LANCZOS).save(f'{p}/ic_launcher.png')
+              im.resize((size, size), Image.LANCZOS).save(f'{p}/ic_launcher_round.png')
+          print('icons done from', src)
+          "
           DEST=android/app/src/main/java/com/wavelord/mathlab
           mkdir -p $DEST
           if [ -d overlay ]; then
