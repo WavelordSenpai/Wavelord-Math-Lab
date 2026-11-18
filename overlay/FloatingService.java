@@ -28,7 +28,6 @@ public class FloatingService extends Service {
     public void onCreate() {
         super.onCreate();
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-        // FIX: Smaller, higher - not on navigation bar
         buddyView = makeBubble("Σ", "MATH BUDDY", "#22D3EE", 20, 700, "buddy");
         waiterView = makeBubble("🧮", "WAITER", "#8B5CF6", 800, 700, "waiter");
         wm.addView(buddyView, (WindowManager.LayoutParams) buddyView.getTag());
@@ -57,7 +56,6 @@ public class FloatingService extends Service {
         bubble.setTextSize(24);
         bubble.setTextColor(Color.WHITE);
         bubble.setGravity(Gravity.CENTER);
-        // FIX: 120 instead of 170 - smaller
         bubble.setWidth(120);
         bubble.setHeight(120);
         GradientDrawable bubbleBg = new GradientDrawable();
