@@ -42,9 +42,27 @@ public class MainActivity extends Activity {
         s.setAllowContentAccess(true);
 
         webView.setWebViewClient(new WebViewClient());
-        webView.loadUrl("https://wavelord-math-lab.netlify.app/");
+
+        String open = getIntent().getStringExtra("open");
+        if (open != null && open.equals("buddy")) {
+            webView.loadUrl("https://wavelord-math-lab.netlify.app/?open=buddy");
+        } else if (open != null && open.equals("waiter")) {
+            webView.loadUrl("https://wavelord-math-lab.netlify.app/?open=waiter");
+        } else {
+            webView.loadUrl("https://wavelord-math-lab.netlify.app/");
+        }
 
         checkOverlay();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        String open = intent.getStringExtra("open");
+        if (open != null && webView != null) {
+            webView.loadUrl("https://wavelord-math-lab.netlify.app/?open=" + open);
+        }
     }
 
     private void checkOverlay() {
@@ -57,8 +75,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        // Start bubbles, then REMOVE the screen completely
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
             startService(new Intent(this, FloatingService.class));
+            // This is the fix - screen comes off, only bubbles stay
+            finish();
         }
     }
 
@@ -77,7 +98,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopService(new Intent(this, FloatingService.class));
         if (webView != null) webView.destroy();
     }
 }
