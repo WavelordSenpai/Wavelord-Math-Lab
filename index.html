@@ -370,10 +370,24 @@ async function askBuddy(){
   } catch(e){ $('cans').innerText = "Error: " + e.message; }
 	}
 function openChoice(){$('choice').classList.toggle('open');$('cp').classList.remove('open');$('fcalc').classList.remove('open')}
-function calcOpen(){$('fcalc').classList.toggle('open');$('choice').classList.remove('open')}
-function minApp(){$('main').style.display='none';$('sidebar').classList.add('hidden');$('collapsed').classList.add('show');$('fcalc').classList.remove('open');$('choice').classList.remove('open');$('cp').classList.remove('open')}
+function calcOpen(){$('fcalc').classList.toggle('open');$('choice').classList.remove('open');$('collapsed').classList.remove('show')}
+function minApp(){
+  // FIX: In the Android app, tell Android to minimize - do NOT show black screen
+  if (window.AndroidMinimize) {
+    window.AndroidMinimize.minimize();
+    return;
+  }
+  // Only show black screen when in normal browser, not in app
+  $('collapsed').classList.add('show');
+}
+
+function maxApp(){
+  $('collapsed').classList.remove('show');
+  $('fcalc').classList.remove('open');
+  $('choice').classList.remove('open');
+}
 function maxApp(){$('main').style.display='flex';$('collapsed').classList.remove('show');$('fcalc').classList.remove('open');$('choice').classList.remove('open');setTimeout(rs,100)}
-function justCalc(){minApp();$('fcalc').classList.add('open')}
+function function justCalc(){$('choice').classList.remove('open');$('collapsed').classList.remove('show');$('fcalc').classList.add('open');cLive()}
 function ev(s){s=s.replace(/π/g,'PI').replace(/\^/g,'**');if(!/^(?:[\d+\-*\/().\s%]|PI|sqrt|sin|cos|tan|log|ln)*$/.test(s))throw 0;return Function('const{PI,sqrt,log10:log,log:ln}=Math,r=Math.PI/180,sin=x=>Math.sin(x*r),cos=x=>Math.cos(x*r),tan=x=>Math.tan(x*r);return('+s+')')()}
 function cLive(){let s=$('cin').value.trim();if(!s){$('cres').innerText='';return}try{$('cres').innerText='= '+Math.round(ev(s)*1e8)/1e8}catch(e){$('cres').innerText='...'}}
 ['C','sin(','cos(','√','7','8','9','/','4','5','6','*','1','2','3','-','0','.','π','+','(',')','^','='].forEach(k=>{let b=document.createElement('button');b.innerText=k==='√'?'√(':k;if('+-*/^'.includes(k))b.className='op';if(k==='=')b.className='eq';if(['C','sin(','cos(','√','π'].includes(k))b.className='fn';b.onclick=()=>{let i=$('cin');if(k==='C')i.value='';else if(k==='='){try{i.value=Math.round(ev(i.value)*1e8)/1e8}catch(e){}}else i.value+=k==='√'?'sqrt(':k;cLive()};$('keys').appendChild(b)});
