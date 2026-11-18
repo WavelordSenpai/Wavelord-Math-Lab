@@ -28,8 +28,9 @@ public class FloatingService extends Service {
     public void onCreate() {
         super.onCreate();
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-        buddyView = makeBubble("Σ", "MATH BUDDY", "#22D3EE", 20, 1100, "buddy");
-        waiterView = makeBubble("🧮", "WAITER", "#8B5CF6", 780, 1100, "waiter");
+        // FIX: Smaller, higher - not on navigation bar
+        buddyView = makeBubble("Σ", "MATH BUDDY", "#22D3EE", 20, 700, "buddy");
+        waiterView = makeBubble("🧮", "WAITER", "#8B5CF6", 800, 700, "waiter");
         wm.addView(buddyView, (WindowManager.LayoutParams) buddyView.getTag());
         wm.addView(waiterView, (WindowManager.LayoutParams) waiterView.getTag());
     }
@@ -41,9 +42,9 @@ public class FloatingService extends Service {
 
         TextView labelView = new TextView(this);
         labelView.setText(label);
-        labelView.setTextSize(9);
+        labelView.setTextSize(8);
         labelView.setTextColor(Color.WHITE);
-        labelView.setPadding(18, 8, 18, 8);
+        labelView.setPadding(12, 6, 12, 6);
         GradientDrawable labelBg = new GradientDrawable();
         labelBg.setColor(Color.BLACK);
         labelBg.setCornerRadius(50);
@@ -53,15 +54,16 @@ public class FloatingService extends Service {
 
         TextView bubble = new TextView(this);
         bubble.setText(emoji);
-        bubble.setTextSize(32);
+        bubble.setTextSize(24);
         bubble.setTextColor(Color.WHITE);
         bubble.setGravity(Gravity.CENTER);
-        bubble.setWidth(170);
-        bubble.setHeight(170);
+        // FIX: 120 instead of 170 - smaller
+        bubble.setWidth(120);
+        bubble.setHeight(120);
         GradientDrawable bubbleBg = new GradientDrawable();
         bubbleBg.setShape(GradientDrawable.OVAL);
         bubbleBg.setColor(Color.parseColor(colorHex));
-        bubbleBg.setStroke(6, Color.WHITE);
+        bubbleBg.setStroke(4, Color.WHITE);
         bubble.setBackground(bubbleBg);
 
         container.addView(labelView);
@@ -179,7 +181,7 @@ public class FloatingService extends Service {
             : WindowManager.LayoutParams.TYPE_PHONE;
 
         WindowManager.LayoutParams p = new WindowManager.LayoutParams(
-            900, 1200, type,
+            800, 1000, type,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT);
         p.gravity = Gravity.CENTER;
