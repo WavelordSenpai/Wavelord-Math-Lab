@@ -1,16 +1,16 @@
 package com.wavelord.mathlab;
 
-import 【entity-android¦canonical_name=Android】.app.Activity;
-import 【entity-android¦canonical_name=Android】.content.Intent;
-import 【entity-android¦canonical_name=Android】.net.Uri;
-import 【entity-android¦canonical_name=Android】.os.Build;
-import 【entity-android¦canonical_name=Android】.os.Bundle;
-import 【entity-android¦canonical_name=Android】.provider.Settings;
-import 【entity-android¦canonical_name=Android】.view.ViewGroup;
-import 【entity-android¦canonical_name=Android】.webkit.WebSettings;
-import 【entity-android¦canonical_name=Android】.webkit.WebView;
-import 【entity-android¦canonical_name=Android】.webkit.WebViewClient;
-import 【entity-android¦canonical_name=Android】.widget.FrameLayout;
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 
 public class MainActivity extends Activity {
     private WebView webView;
@@ -44,7 +44,6 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient());
         webView.loadUrl("https://wavelord-math-lab.netlify.app/");
 
-        // Ask for overlay permission once
         checkOverlay();
     }
 
@@ -58,7 +57,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        // THIS IS THE MISSING CALL - collapse = start bubbles
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
             startService(new Intent(this, FloatingService.class));
         }
@@ -67,7 +65,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Back in app = hide bubbles
         stopService(new Intent(this, FloatingService.class));
     }
 
@@ -83,4 +80,4 @@ public class MainActivity extends Activity {
         stopService(new Intent(this, FloatingService.class));
         if (webView != null) webView.destroy();
     }
-                         }
+}
