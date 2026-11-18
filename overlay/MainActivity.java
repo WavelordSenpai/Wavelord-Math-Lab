@@ -1,14 +1,14 @@
 package com.wavelord.mathlab;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.Settings;
-import android.view.ViewGroup;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebSettings;
+import 【entity-android¦canonical_name=Android】.app.Activity;
+import 【entity-android¦canonical_name=Android】.content.Intent;
+import 【entity-android¦canonical_name=Android】.net.Uri;
+import 【entity-android¦canonical_name=Android】.os.Build;
+import 【entity-android¦canonical_name=Android】.os.Bundle;
+import 【entity-android¦canonical_name=Android】.provider.Settings;
+import 【entity-android¦canonical_name=Android】.view.ViewGroup;
+import 【entity-android¦canonical_name=Android】.webkit.JavascriptInterface;
+import 【entity-android¦canonical_name=Android】.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
@@ -21,6 +21,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void minimize() {
             runOnUiThread(() -> {
+                // ONLY place bubbles start now - when YOU press Minimize
                 startService(new Intent(MainActivity.this, FloatingService.class));
                 moveTaskToBack(true);
                 finish();
@@ -82,13 +83,10 @@ public class MainActivity extends Activity {
         }
     }
 
+    // FIX: onPause is now EMPTY - Recents / Home / WhatsApp switch will NOT trigger bubbles anymore
     @Override
     protected void onPause() {
         super.onPause();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
-            startService(new Intent(this, FloatingService.class));
-            finish();
-        }
     }
 
     @Override
