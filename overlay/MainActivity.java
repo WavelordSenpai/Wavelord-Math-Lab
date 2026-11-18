@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -15,6 +16,17 @@ import android.widget.FrameLayout;
 public class MainActivity extends Activity {
     private WebView webView;
     private static final int OVERLAY_REQ = 1234;
+
+    public class MinimizeBridge {
+        @JavascriptInterface
+        public void minimize() {
+            runOnUiThread(() -> {
+                startService(new Intent(MainActivity.this, FloatingService.class));
+                moveTaskToBack(true);
+                finish();
+            });
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,17 +53,15 @@ public class MainActivity extends Activity {
         s.setAllowFileAccess(true);
         s.setAllowContentAccess(true);
 
+        webView.addJavascriptInterface(new MinimizeBridge(), "AndroidMinimize");
         webView.setWebViewClient(new WebViewClient());
 
         String open = getIntent().getStringExtra("open");
-        if (open != null && open.equals("buddy")) {
-            webView.loadUrl("https://wavelord-math-lab.netlify.app/?open=buddy");
-        } else if (open != null && open.equals("waiter")) {
-            webView.loadUrl("https://wavelord-math-lab.netlify.app/?open=waiter");
+        if (open != null) {
+            webView.loadUrl("https://wavelord-math-lab.netlify.app/?open=" + open);
         } else {
             webView.loadUrl("https://wavelord-math-lab.netlify.app/");
         }
-
         checkOverlay();
     }
 
@@ -75,10 +85,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        // Start bubbles, then REMOVE the screen completely
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
             startService(new Intent(this, FloatingService.class));
-            // This is the fix - screen comes off, only bubbles stay
             finish();
         }
     }
