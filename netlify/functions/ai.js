@@ -16,6 +16,9 @@ exports.handler = async (event) => {
     if (!question) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: "No question" }) };
     }
+    if (!process.env.GROQ_API_KEY) {
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "GROQ_API_KEY is missing in Netlify - add it in Site Settings > Environment variables" }) };
+    }
     const isBuddy = persona === "buddy";
     const systemPrompt = isBuddy
       ? `You are ∑ Math Buddy, a warm friendly best-friend AI in the Wavelord Math Lab app. You can answer ANYTHING - maths, science, homework, life, jokes, stories, coding, history, anything the user asks. Be encouraging, funny, kind. Keep replies short, 2-4 sentences, easy to read on a phone. If it's maths, use real life examples like money, pizza, shop. User is on topic: ${topic || "General"}.`
@@ -38,6 +41,9 @@ exports.handler = async (event) => {
       }),
     });
     const data = await res.json();
+    if (!res.ok) {
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Groq error: " + (data?.error?.message || res.status) }) };
+    }
     const answer = data?.choices?.[0]?.message?.content || "I'm quiet right now, try again.";
     return { statusCode: 200, headers, body: JSON.stringify({ answer }) };
   } catch (e) {
