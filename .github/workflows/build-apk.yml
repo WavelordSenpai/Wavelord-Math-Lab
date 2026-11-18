@@ -32,14 +32,25 @@ jobs:
           from PIL import Image
           import os
           src = 'icon-512.png' if os.path.exists('icon-512.png') else 'icon-192.png'
+          print('USING ICON:', src)
+          im = Image.open(src).convert('RGBA')
+          # Full icon for legacy + foreground for adaptive
           sizes = {'mipmap-mdpi':48,'mipmap-hdpi':72,'mipmap-xhdpi':96,'mipmap-xxhdpi':144,'mipmap-xxxhdpi':192}
-          im = Image.open(src).convert('RGB')
           for folder, size in sizes.items():
               p = f'android/app/src/main/res/{folder}'
               os.makedirs(p, exist_ok=True)
               im.resize((size, size), Image.LANCZOS).save(f'{p}/ic_launcher.png')
               im.resize((size, size), Image.LANCZOS).save(f'{p}/ic_launcher_round.png')
-          print('icons done from', src)
+              im.resize((size, size), Image.LANCZOS).save(f'{p}/ic_launcher_foreground.png')
+              # Solid background for adaptive icon
+              bg = Image.new('RGBA', (size, size), (106, 17, 203, 255))
+              bg.save(f'{p}/ic_launcher_background.png')
+          # Adaptive icon XMLs - this is what the Install screen uses
+          anydpi = 'android/app/src/main/res/mipmap-anydpi-v26'
+          os.makedirs(anydpi, exist_ok=True)
+          open(f'{anydpi}/ic_launcher.xml','w').write('<?xml version=\"1.0\" encoding=\"utf-8\"?><adaptive-icon xmlns:android=\"http://schemas.android.com/apk/res/android\"><background android:drawable=\"@mipmap/ic_launcher_background\"/><foreground android:drawable=\"@mipmap/ic_launcher_foreground\"/></adaptive-icon>')
+          open(f'{anydpi}/ic_launcher_round.xml','w').write('<?xml version=\"1.0\" encoding=\"utf-8\"?><adaptive-icon xmlns:android=\"http://schemas.android.com/apk/res/android\"><background android:drawable=\"@mipmap/ic_launcher_background\"/><foreground android:drawable=\"@mipmap/ic_launcher_foreground\"/></adaptive-icon>')
+          print('icons done')
           "
           DEST=android/app/src/main/java/com/wavelord/mathlab
           mkdir -p $DEST
