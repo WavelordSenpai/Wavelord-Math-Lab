@@ -63,7 +63,7 @@ input[type=range]{accent-color:var(--ac);padding:0;height:28px}
 #rush .ans{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}#rush .ans button{padding:12px;border-radius:12px;background:#fff;color:#000;font-weight:900;font-size:18px;border:0}
 @media(min-width:900px){#panel,#fv{max-width:760px;margin:0 auto;width:100%}}
 /* FIXED MINIMIZE - dark, NOT transparent (transparent = white screen), NOT black-screen div */
-html.is-minimized, body.is-minimized{background:#07070f !important}
+html.is-minimized, body.is-minimized{background:transparent !important}
 body.is-minimized #main, body.is-minimized #sidebar{display:none !important}
 body.is-minimized .bub{display:flex !important}
 body.is-minimized .pop, body.is-minimized #fcalc{display:none}
@@ -73,7 +73,6 @@ body.is-minimized .pop.open, body.is-minimized #fcalc.open{display:block !import
 #aeroBox{background:#111118;border:2px solid #facc15;border-radius:16px;width:100%;max-width:420px;max-height:85vh;overflow:auto;padding:16px}
 #aeroLogText{white-space:pre-wrap;word-break:break-word;background:#000;border:1px solid #333;border-radius:10px;padding:10px;font-size:11px;max-height:280px;overflow:auto;margin:10px 0}
 #aeroModal button{width:100%;margin-top:8px;padding:11px;border-radius:12px;font-weight:900;border:0;cursor:pointer}
-#app-closed{position:fixed;inset:0;background:#0a0a1a;color:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:99999;text-align:center;padding:20px}
 </style>
 </head>
 <body>
@@ -94,7 +93,7 @@ body.is-minimized .pop.open, body.is-minimized #fcalc.open{display:block !import
 <div id="fcalc"><div class="fh"><span>🧮 WAVELORD CALCULATOR</span><span><button onclick="minApp()">⌄ COLLAPSE</button> <button onclick="$('fcalc').classList.remove('open')">✕</button></span></div><input id="cin" value="12*8" oninput="cLive()"><div id="cres"></div><div id="keys"></div><div style="padding:0 10px 10px"><button class="go" style="width:100%" onclick="maxApp()">↗ Back to entire app</button><button class="go" style="width:100%;background:#ff3b30;color:#fff;margin-top:8px" onclick="exitApp()">✕ EXIT APP</button></div></div>
 <div id="toast"></div>
 <div id="aeroModal"><div id="aeroBox"><h3 style="color:#facc15">🛠️ AeroLog - Debug Log</h3><p id="aeroInfo" style="font-size:12px;opacity:.7;margin:6px 0">Admin only. Errors are logged automatically.</p><div id="aeroLogText">No errors yet.</div><button style="background:#facc15;color:#000" onclick="aeroCopy()">📋 Copy Log</button><button style="background:#22d3ee;color:#000" onclick="aeroSend()">📧 Send Log to Support</button><button style="background:#1c1c33;color:#fff" onclick="aeroClose()">Close</button></div></div>
-<div id="app-closed"><div style="font-size:50px">🧮</div><h2>Math Lab Closed</h2><p>Floating bubbles removed.</p><button onclick="reopenAfterExit()" style="background:#6A11CB;color:white;border:none;padding:12px 24px;border-radius:25px;font-size:16px;font-weight:bold;">Reopen Math Lab</button></div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 	// ===== AEROLOG =====
@@ -415,26 +414,27 @@ function cLive(){try{let s=$('cin').value.replace(/π/g,'PI').replace(/\^/g,'**'
 function minApp(){
   document.body.classList.add('is-minimized');
   document.documentElement.classList.add('is-minimized');
-  $('cp').classList.remove('open'); $('choice').classList.remove('open'); $('fcalc').classList.remove('open');
-  $('cw').style.display='flex'; $('ww').style.display='flex';
-  toast('Minimized — Buddy left, Waiter right');
+  $('cp').classList.remove('open');
+  $('choice').classList.remove('open');
+  $('fcalc').classList.remove('open');
+  $('cw').style.display='flex';
+  $('ww').style.display='flex';
+  // NOTHING ELSE. No mini window. No black div. No white.
 }
 function maxApp(){
   document.body.classList.remove('is-minimized');
   document.documentElement.classList.remove('is-minimized');
-  $('cp').classList.remove('open'); $('choice').classList.remove('open'); $('app-closed').style.display='none';
-  // FIXED 3D: stage was 0x0 while hidden - resize + redraw or 3D stays blank
-  setTimeout(()=>{ try{ resize(); select(cur); }catch(e){ aeroAdd('maxApp: '+e.message); } }, 80);
+  $('cp').classList.remove('open');
+  $('choice').classList.remove('open');
+  setTimeout(()=>{
+    try{ resize(); select(cur); }catch(e){}
+  }, 80);
 }
-function exitApp(){
-  document.body.classList.add('is-minimized');
-  $('cp').classList.remove('open'); $('choice').classList.remove('open'); $('fcalc').classList.remove('open');
-  $('app-closed').style.display='flex'; $('cw').style.display='none'; $('ww').style.display='none';
-}
-function reopenAfterExit(){maxApp(); select(cur); toast('Welcome back!');}
+
 function justCalc(){
-  $('choice').classList.remove('open'); $('app-closed').style.display='none';
-  document.body.classList.add('is-minimized'); document.documentElement.classList.add('is-minimized');
+  $('choice').classList.remove('open');
+  document.body.classList.add('is-minimized');
+  document.documentElement.classList.add('is-minimized');
   calcOpen();
 }
 function openBuddy(){
@@ -546,4 +546,4 @@ makeDraggable($('cw')); makeDraggable($('ww'));
 buildF(); resize(); buildNav(); select('add'); animate(); aeroUpdateBadge();
 </script>
 </body>
-  </html>
+	</html>
