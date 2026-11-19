@@ -83,7 +83,7 @@ add:{i:'💰',n:'Addition',k:3,eq:'a + b = total',sl:[['a','Green $ you have',0,
 sub:{i:'💸',n:'Subtraction',k:3,eq:'left = start − spent',sl:[['a','Start $',0,100,1,25],['b','Spend $',0,100,1,10]],explain:'WHAT: Start with a pile, take some away. What stays is left.',why:'WHY: 25 - 10 = 15 because 15 + 10 = 25 again.',real:'WHO: Shopping, fuel, baker.',jargon:'JARGON: Start = MINUEND. Spent = SUBTRAHEND. Left = DIFFERENCE. − = take away.',try:'TRY: 100 - 40.',q:()=>{let a=R(15,80),b=R(3,40);return['You have $'+a+' and spend $'+b+'. Left?',a-b]},go(p){return drawMarbles(p,'sub')}},
 mul:{i:'🧱',n:'Multiplication',k:3,eq:'a × b (× layers) = blocks',sl:[['a','Across',1,10,1,4],['b','Down',1,10,1,3],['c','Layers',1,5,1,1]],explain:'WHAT: 4 + 4 + 4 = "3 groups of 4". A rectangle of blocks.',why:'WHY: Multiplication is FAST repeated addition.',real:'WHO: Tiler, farmer, warehouse.',jargon:'JARGON: a,b = FACTORS. Answer = PRODUCT. × = groups of. Area = Across × Down. Volume = Area × Layers.',try:'TRY: Layers 1 → 3.',q:()=>{let a=R(2,9),b=R(2,9);return['A tray has '+a+' rows of '+b+' eggs. How many?',a*b]},go(p){return drawBlocks(p)}},
 div:{i:'🍕',n:'Division',k:3,eq:'eaten ÷ total = fraction',sl:[['num','Slices you eat',1,12,1,3],['den','Total slices',2,12,1,8]],explain:'WHAT: Cut ONE whole into equal pieces. Eating some is a FRACTION.',why:'WHY: Cut into 8, eat 3 = 3/8.',real:'WHO: Splitting pizza / bill.',jargon:'JARGON: num = NUMERATOR = how many you take. den = DENOMINATOR = how many pieces total. 3/8 = "three eighths".',try:'TRY: 6/12 = half.',q:()=>{let n=R(2,6),k=R(2,6);return[n*k+' cookies shared by '+n+' friends. Each gets?',k]},go(p){let den=p.den,num=Math.min(p.num,den);pizza(num,den);return['Pizza '+num+'/'+den,'🍕 '+num+' ÷ '+den+' = '+(num/den).toFixed(3)+' ('+Math.round(num/den*100)+'%)']}},
-pyt:{i:'🏠',n:'Pythagoras',k:2,eq:'a² + b² = c²',sl:[['a','Side a',1,10,1,3],['b','Side b',1,10,1,4]],explain:'WHAT: Right triangle (90° corner). Two short sides lock the long side.\nBlue square + Purple square = Yellow square. Same area.',why:'WHY: Square on long side = two small squares added. 3²+4²=9+16=25, so c=5.',real:'WHO: Carpenter, roofer, drone pilot.',jargon:'JARGON: a,b = LEGS. c = HYPOTENUSE = longest, opposite 90°. a² = a × a. √ = square root.',try:'TRY: 3-4-5, then 6-8-10. Blue + Purple area = Yellow area.',q:()=>{let t=[[3,4,5],[5,12,13],[6,8,10],[8,15,17]][R(0,3)];return['Right triangle sides '+t[0]+' and '+t[1]+'. Long side?',t[2]]},go(p){return[p.a+'² + '+p.b+'² = '+(p.a*p.a+p.b*p.b),'🏠 '+p.a*p.a+' + '+p.b*p.b+' = '+(p.a*p.a+p.b*p.b)+' → c = '+Math.hypot(p.a,p.b).toFixed(2)]}}, 
+pyt:{i:'🏠',n:'Pythagoras',k:2,eq:'a² + b² = c²',sl:[['a','Side a',1,10,1,3],['b','Side b',1,10,1,4]],explain:'WHAT: Right triangle (90° corner). Two short sides lock the long side.\nBlue square + Purple square = Yellow square. Same area.',why:'WHY: Square on long side = two small squares added. 3²+4²=9+16=25, so c=5.',real:'WHO: Carpenter, roofer, drone pilot.',jargon:'JARGON: a,b = LEGS. c = HYPOTENUSE = longest, opposite 90°. a² = a × a. √ = square root.',try:'TRY: 3-4-5, then 6-8-10. Blue + Purple area = Yellow area.',q:()=>{let t=[[3,4,5],[5,12,13],[6,8,10],[8,15,17]][R(0,3)];return['Right triangle sides '+t[0]+' and '+t[1]+'. Long side?',t[2]]},go(p){return[p.a+'² + '+p.b+'² = '+(p.a*p.a+p.b*p.b),'🏠 '+p.a*p.a+' + '+p.b*p.b+' = '+(p.a*p.a+p.b*p.b)+' → c = '+Math.hypot(p.a,p.b).toFixed(2)]}},
 neg:{i:'🌡️',n:'Negatives',k:2,eq:'start − drop = result',sl:[['a','Start °',-30,100,1,5],['b','Drop °',0,60,1,8]],explain:'WHAT: Zero is NOT the bottom. It is a line. Go below = negative. Red = above, Blue = below.',why:'WHY: 5° - 8° = go 5 to 0, then 3 below = -3°.',real:'WHO: Weather, bank overdraft, lift -1.',jargon:'JARGON: POSITIVE = above zero. NEGATIVE = below zero. -3 = "minus three".',try:'TRY: 5 - 8 = -3.',q:()=>{let a=R(1,20),b=a+R(2,20);return['It is '+a+'° and drops '+b+'°. New temp?',a-b]},go(p){negCur=p.a;let t=p.a-p.b,f=n=>(n<0?'−':'')+Math.abs(n);return[f(p.a)+'° − '+p.b+'° = '+f(t)+'°','🌡️ '+f(p.a)+' − '+p.b+' = '+f(t)]}},
 unit:{i:'⭕',n:'Unit Circle',k:2,eq:'cos²θ + sin²θ = 1',sl:[['ang','Angle θ °',0,360,1,45]],explain:'WHAT: Circle radius 1 (UNIT = 1). Hand turns. BLUE = across, PINK = up.',why:'WHY: cos²+sin² always = 1. At 90°, across=0, up=1.',real:'WHO: Electrician, engineer, game maker.',jargon:'JARGON: θ (theta) = ANGLE, how far hand turned. 0°=right, 90°=up. cos θ = ACROSS. sin θ = UP.',try:'TRY: θ 0° → cos 1 sin 0. 90° → cos 0 sin 1.',q:()=>{return['At 90°, what is cos?',0]},go(p){return['θ = '+p.ang+'°','⭕ cos='+(Math.cos(p.ang*Math.PI/180)).toFixed(3)+' sin='+(Math.sin(p.ang*Math.PI/180)).toFixed(3)]}},
 eul:{i:'🏦',n:'Euler e',k:2,eq:'(1 + 1/n)ⁿ → e ≈ 2.71828',sl:[['k','Pay interest more often',1,6,1,1]],explain:'WHAT: $1 at 100% a year, paid nonstop, never passes $2.718. That ceiling is e.',why:'WHY: Smaller chunks = interest on interest, but limit is e.',real:'WHO: Bank, biologist, physicist.',jargon:'JARGON: e = 2.71828… n = times per year. 1=yearly, 12=monthly, 365=daily.',try:'TRY: Slide k 1 → 6, watch flatten at e.',go(p){let n=NS[p.k-1],v=Math.pow(1+1/n,n);return['(1 + 1/'+n+')^'+n,'🏦 $1 = $'+v.toFixed(5)]}},
@@ -117,8 +117,7 @@ lorenz:{i:'🦋',n:'Lorenz Butterfly',k:2,eq:'dx/dt = σ(y−x), dy/dt = x(ρ−
 voronoi:{i:'🗺️',n:'Voronoi Worlds',k:2,eq:'d(P,A) = √[(x−xₐ)² + (y−yₐ)²]',explain:'WHAT: Every point claims space closest to it.',why:'WHY: Border is halfway between two centres.',real:'WHO: Map maker, phone towers, hospitals.',jargon:'JARGON: VORONOI = closest-point map. SITE = centre dot. CELL = territory. d(P,A) = distance.',try:'TRY: Drag a dot, tap empty to add.',sl:[['count','Number of territories',5,100,1,32],['color','Color variation',0,100,1,70]],q:null,go(p){return['Voronoi — '+((p.count||32))+' territories','🗺️ Voronoi']}},
 cymatics:{i:'🌊',n:'Cymatics World',k:2,eq:'z(x,y,t) = A sin(kₓx) sin(kᵧy) cos(ωt)  •  k = 2πf / v',explain:'WHAT: When sound becomes geometry. Plate vibrates, sand settles on still places.',why:'WHY: Wave = sin X TIMES sin Y. Where either = 0, whole = 0 — NODE.',real:'WHO: Hans Jenny, Chladni 1787, speaker makers, doctors (ultrasound).',jargon:'JARGON: A = AMPLITUDE = how TALL. f = FREQUENCY. k = 2πf / v. ω (omega) = how fast it wiggles. NODE = still place. ANTINODE = most movement. STANDING WAVE = looks still, just breathing.',try:'TRY: fx=1,fy=1 = one bump. fx=8,fy=8 = checkerboard. Geometry: Surface → Nodes → Contours.',sl:[['fx','X frequency fx — bumps across',1,12,1,3],['fy','Y frequency fy — bumps down',1,12,1,4],['amp','Wave amplitude A — how tall',0.1,2.5,.1,1],['speed','Animation speed',0,3,.1,1]],q:null,go(p){return['Cymatics '+p.fx+' × '+p.fy+' — standing waves','🌊 Cymatics']}},
 };
-Object.assign(T,STUDIO);
-const stage=$('stage'),scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(50,1,.1,500),renderer=new THREE.WebGLRenderer({antialias:true});
+Object.assign(T,STUDIO);const stage=$('stage'),scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(50,1,.1,500),renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));stage.insertBefore(renderer.domElement,stage.firstChild);
 scene.background=new THREE.Color(0x07070f);scene.add(new THREE.AmbientLight(0x9a8bff,.8));let dl=new THREE.DirectionalLight(0xffffff,1.1);dl.position.set(6,12,8);scene.add(dl);
 let grid=new THREE.GridHelper(40,40,0x333355,0x1a1a2e);grid.position.y=-.7;scene.add(grid);
@@ -169,7 +168,7 @@ function cymWave(x,y){return (p.amp||1)*Math.sin((p.fx||3)*Math.PI*x)*Math.sin((
 function cymColor(v){let a=Math.min(1,Math.abs(v)),r,g,b;if(cym.palette==='purple'){r=65+a*160;g=35+a*90;b=140+a*115;}else if(cym.palette==='ocean'){r=15+a*60;g=75+a*125;b=130+a*125;}else if(cym.palette==='gold'){r=100+a*155;g=65+a*165;b=15+a*90;}else{r=80+a*170;g=120+a*130;b=170+a*85;}return 'rgb('+r+','+g+','+b+')';}
 function drawCymatics(x,W,H){if(!cym.paused)cym.t+=0.035*(p.speed||1);let bg=x.createRadialGradient(W*.5,H*.5,5,W*.5,H*.5,Math.max(W,H)*.75);bg.addColorStop(0,'#191632');bg.addColorStop(1,'#070817');x.fillStyle=bg;x.fillRect(0,0,W,H);let proj=(xx,yy,zz)=>{let px=(xx-0.5)*2.4,py=(yy-0.5)*2.4,pz=zz*0.75;let cy=Math.cos(cym.rotY),sy=Math.sin(cym.rotY);let rx=px*cy-pz*sy,rz=px*sy+pz*cy;let cx=Math.cos(cym.rotX),sx=Math.sin(cym.rotX);let ry=py*cx-rz*sx;rz=py*sx+rz*cx;let sc=Math.min(W,H)*0.36;return{x:W*0.5+rx*sc,y:H*0.52-ry*sc,depth:rz};};let N=cym.geom==='surface'?50:70;if(cym.geom==='surface'){for(let yy=0;yy<N-1;yy++)for(let xx=0;xx<N-1;xx++){let x1=xx/(N-1),y1=yy/(N-1),x2=(xx+1)/(N-1),y2=(yy+1)/(N-1);let a=cymWave(x1,y1),b=cymWave(x2,y1),c2=cymWave(x2,y2),d=cymWave(x1,y2);let p1=proj(x1,y1,a),p2=proj(x2,y1,b),p3=proj(x2,y2,c2),p4=proj(x1,y2,d);x.beginPath();x.moveTo(p1.x,p1.y);x.lineTo(p2.x,p2.y);x.lineTo(p3.x,p3.y);x.lineTo(p4.x,p4.y);x.closePath();x.fillStyle=cymColor((a+b+c2+d)/4);x.fill();x.strokeStyle='rgba(220,205,255,0.15)';x.lineWidth=0.45;x.stroke();}}else if(cym.geom==='nodes'){for(let yy=0;yy<=N;yy++)for(let xx=0;xx<=N;xx++){let px=xx/N,py=yy/N,v=cymWave(px,py);if(Math.abs(v)<0.09){let pr=proj(px,py,0);x.beginPath();x.arc(pr.x,pr.y,2.8,0,6.3);x.fillStyle='#ffffff';x.fill();}}x.strokeStyle='rgba(255,255,255,0.35)';x.lineWidth=1;x.beginPath();let c1=proj(0,0,0),c2=proj(1,0,0),c3=proj(1,1,0),c4=proj(0,1,0);x.moveTo(c1.x,c1.y);x.lineTo(c2.x,c2.y);x.lineTo(c3.x,c3.y);x.lineTo(c4.x,c4.y);x.closePath();x.stroke();}else{for(let lvl=-18;lvl<=18;lvl++){let target=lvl/18;x.fillStyle=cymColor(target);for(let yy=0;yy<=N;yy++)for(let xx=0;xx<=N;xx++){let px=xx/N,py=yy/N,v=cymWave(px,py);if(Math.abs(v-target)<0.02){let pr=proj(px,py,v);x.beginPath();x.arc(pr.x,pr.y,1.8,0,6.3);x.fill();}}}}x.fillStyle='#fff';x.textAlign='left';x.fillText('🌊 CYMATICS '+p.fx+' × '+p.fy+'  A='+(p.amp||1)+'  '+(cym.paused?'PAUSED':'ACTIVE')+'  '+cym.geom.toUpperCase(),14,H-10);}
 function drawNew2(x,W,H){
-	if(cur==='surface'){
+if(cur==='surface'){
   let l=p.l||3, w=p.w||2, h=p.h||2;
   let sa=2*(l*w+l*h+w*h), v=l*w*h;
   let sc=Math.min((W-40)/(l+2*w),(H-130)/(2*h+2*w));
@@ -180,16 +179,15 @@ function drawNew2(x,W,H){
     x.fillStyle='#fff'; x.textAlign='center'; x.font='900 16px system-ui';
     x.fillText(area, px+fw*sc/2, py+fh*sc/2+6);
   }
-  // Net - flat, labels are ONLY the area number now
-  face(cx-l*sc/2, cy-h*sc-w*sc, l, w, '#22d3ee', l*w); // Top
-  face(cx-l*sc/2, cy-h*sc, l, h, '#a78bfa', l*h); // Front
-  face(cx-l*sc/2, cy, l, w, '#22d3ee', l*w); // Bottom
-  face(cx-l*sc/2-w*sc, cy-h*sc, w, h, '#facc15', w*h); // Left
-  face(cx+l*sc/2, cy-h*sc, w, h, '#facc15', w*h); // Right
-  face(cx-l*sc/2, cy+w*sc, l, h, '#a78bfa', l*h); // Back
+  face(cx-l*sc/2, cy-h*sc-w*sc, l, w, '#22d3ee', l*w);
+  face(cx-l*sc/2, cy-h*sc, l, h, '#a78bfa', l*h);
+  face(cx-l*sc/2, cy, l, w, '#22d3ee', l*w);
+  face(cx-l*sc/2-w*sc, cy-h*sc, w, h, '#facc15', w*h);
+  face(cx+l*sc/2, cy-h*sc, w, h, '#facc15', w*h);
+  face(cx-l*sc/2, cy+w*sc, l, h, '#a78bfa', l*h);
   return true;
 }
-	if(cur==='pyt'){
+if(cur==='pyt'){
   let a=p.a||3, b=p.b||4, c=Math.hypot(a,b);
   let sc=Math.min((W-40)/(a+c),(H-80)/(b+c))*0.85;
   let ox=W/2-(a*sc)/2+ (b*sc)*0.2, oy=H/2+40;
@@ -247,11 +245,10 @@ if(cur==='factors'){let n=p.n||12,f=[];for(let i=1;i<=n;i++)if(n%i===0)f.push(i)
 if(cur==='surface'){let l=p.l||3,w=p.w||2,h=p.h||2,sa=2*(l*w+l*h+w*h);x.fillStyle='#fff';x.textAlign='center';x.fillText('Box '+l+' × '+w+' × '+h, W/2, 40);x.fillText('Surface Area = '+sa+'  Volume = '+(l*w*h), W/2, H/2);x.fillText('Wrapping paper = '+sa+' squares', W/2, H/2+30);return true;}
 if(cur==='speed'){
   let d=p.d||120, t=p.t||2, sp=d/t;
-  // Trip takes t seconds on screen (t = hours slider), then 1 sec pause at flag
   let tripTime = Math.max(1, Math.min(6, t));
   let cycle = tripTime + 1;
   let now = (Date.now()/1000) % cycle;
-  let progress = now < tripTime ? now / tripTime : 1; // 0 to 1, then hold at 1
+  let progress = now < tripTime ? now / tripTime : 1;
   let startX = 30, endX = W-40;
   let carX = startX + (endX - startX) * progress;
   x.fillStyle='#0a0a1a'; x.fillRect(0,0,W,H);
@@ -261,7 +258,6 @@ if(cur==='speed'){
   x.fillStyle='#fff'; x.textAlign='center'; x.font='900 12px system-ui';
   x.fillText('0 km',30,H/2+10); x.fillText(d+' km',W-30,H/2+10);
   x.font='900 24px system-ui'; x.fillText('🏁',W-30,H/2-10);
-    // DRAWN CAR - RED, faces RIGHT, small white headlight
   x.fillStyle='#ef4444'; x.fillRect(carX-28, H/2+2, 56, 18);
   x.fillStyle='#ef4444'; x.fillRect(carX-14, H/2-12, 30, 14);
   x.fillStyle='#dbeafe'; x.fillRect(carX-8, H/2-10, 18, 10);
@@ -300,8 +296,8 @@ if(cur==='stats'){
   x.font='900 12px system-ui'; x.textAlign='left';
   let meanTxt='Mean '+mean.toFixed(1);
   let mw=x.measureText(meanTxt).width+8;
-  x.fillStyle='#000'; x.fillStyle='#000'; x.fillRect(W-mw-12,meanY-20,mw,16);
-  x.fillStyle='#fff'; x.fillStyle='#fff'; x.fillText(meanTxt,W-mw-8,meanY-8);
+  x.fillStyle='#000'; x.fillRect(W-mw-12,meanY-20,mw,16);
+  x.fillStyle='#fff'; x.fillText(meanTxt,W-mw-8,meanY-8);
   let medX;
   if(scores.length%2){ medX=20+Math.floor(scores.length/2)*bw+bw/2; }
   else { medX=20+(scores.length/2)*bw; }
@@ -311,8 +307,8 @@ if(cur==='stats'){
   let medTxt='Median '+median;
   let medW=x.measureText(medTxt).width+8;
   let medLX=Math.max(4,Math.min(W-medW-4,medX-medW/2));
-  x.fillStyle='#000'; x.fillStyle='#000'; x.fillRect(medLX,36,medW,16);
-  x.fillStyle='#22c55e'; x.fillStyle='#22c55e'; x.fillText(medTxt,medLX+medW/2,48);
+  x.fillStyle='#000'; x.fillRect(medLX,36,medW,16);
+  x.fillStyle='#22c55e'; x.fillText(medTxt,medLX+medW/2,48);
   x.fillStyle='#fff'; x.textAlign='center';
   x.fillText('Mode '+mode+' (yellow)',W/2,H-10);
   return true;
@@ -368,40 +364,41 @@ async function askBuddy(){
     const d = await r.json();
     $('cans').innerText = d.answer || d.error || "No answer";
   } catch(e){ $('cans').innerText = "Error: " + e.message; }
-	}
+}
 function openChoice(){$('choice').classList.toggle('open');$('cp').classList.remove('open');$('fcalc').classList.remove('open')}
 function calcOpen(){$('fcalc').classList.toggle('open');$('choice').classList.remove('open');$('collapsed').classList.remove('show')}
 function minApp(){
-  // FIX: In the Android app, tell Android to minimize - do NOT show black screen
   if (window.AndroidMinimize) {
     window.AndroidMinimize.minimize();
     return;
   }
-  // Only show black screen when in normal browser, not in app
   $('collapsed').classList.add('show');
 }
-
 function maxApp(){
+  $('main').style.display='flex';
   $('collapsed').classList.remove('show');
   $('fcalc').classList.remove('open');
   $('choice').classList.remove('open');
+  setTimeout(rs,100);
 }
-function maxApp(){$('main').style.display='flex';$('collapsed').classList.remove('show');$('fcalc').classList.remove('open');$('choice').classList.remove('open');setTimeout(rs,100)}
-function function justCalc(){$('choice').classList.remove('open');$('collapsed').classList.remove('show');$('fcalc').classList.add('open');cLive()}
+function justCalc(){
+  $('choice').classList.remove('open');
+  $('collapsed').classList.remove('show');
+  $('fcalc').classList.add('open');
+  cLive();
+}
 function ev(s){s=s.replace(/π/g,'PI').replace(/\^/g,'**');if(!/^(?:[\d+\-*\/().\s%]|PI|sqrt|sin|cos|tan|log|ln)*$/.test(s))throw 0;return Function('const{PI,sqrt,log10:log,log:ln}=Math,r=Math.PI/180,sin=x=>Math.sin(x*r),cos=x=>Math.cos(x*r),tan=x=>Math.tan(x*r);return('+s+')')()}
 function cLive(){let s=$('cin').value.trim();if(!s){$('cres').innerText='';return}try{$('cres').innerText='= '+Math.round(ev(s)*1e8)/1e8}catch(e){$('cres').innerText='...'}}
 ['C','sin(','cos(','√','7','8','9','/','4','5','6','*','1','2','3','-','0','.','π','+','(',')','^','='].forEach(k=>{let b=document.createElement('button');b.innerText=k==='√'?'√(':k;if('+-*/^'.includes(k))b.className='op';if(k==='=')b.className='eq';if(['C','sin(','cos(','√','π'].includes(k))b.className='fn';b.onclick=()=>{let i=$('cin');if(k==='C')i.value='';else if(k==='='){try{i.value=Math.round(ev(i.value)*1e8)/1e8}catch(e){}}else i.value+=k==='√'?'sqrt(':k;cLive()};$('keys').appendChild(b)});
 cLive();buildF();
 if(innerWidth<=700)$('sidebar').classList.add('hidden');
 select('add');loop();
-	// --- DRAGGABLE - cw = Math Buddy, ww = Waiter ---
 function makeDraggable(el){
   if(!el || el.dataset.dragReady) return;
   el.dataset.dragReady = "1";
   el.style.touchAction = "none";
   el.style.cursor = "grab";
   let sx=0, sy=0, ox=0, oy=0, dragging=false, moved=false;
-
   el.addEventListener('pointerdown', e=>{
     dragging=true; moved=false;
     sx=e.clientX; sy=e.clientY;
@@ -411,7 +408,6 @@ function makeDraggable(el){
     el.style.right='auto'; el.style.bottom='auto';
     try{ el.setPointerCapture(e.pointerId); }catch(err){}
   });
-
   el.addEventListener('pointermove', e=>{
     if(!dragging) return;
     const dx=e.clientX-sx, dy=e.clientY-sy;
@@ -421,22 +417,17 @@ function makeDraggable(el){
       el.style.top=(oy+dy)+'px';
     }
   });
-
   const stop = ()=>{
     dragging=false;
-    // keep moved=true for a tiny bit so the click doesn't open the popup
     if(moved) setTimeout(()=>{ moved=false; }, 150);
   };
   el.addEventListener('pointerup', stop);
   el.addEventListener('pointercancel', stop);
-
-  // THIS is the key part - block the inner button's onclick after a drag
   el.addEventListener('click', e=>{
     if(moved){ e.stopPropagation(); e.preventDefault(); }
   }, true);
 }
-
-makeDraggable(document.getElementById('cw')); // Math Buddy
-makeDraggable(document.getElementById('ww')); // Waiter / Calculator bubble
+makeDraggable(document.getElementById('cw'));
+makeDraggable(document.getElementById('ww'));
 </script>
 </body></html>
