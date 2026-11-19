@@ -31,22 +31,24 @@ input[type=range]{accent-color:var(--ac);padding:0;height:28px}
 .logo{padding:14px 16px 0;font-weight:900;font-size:21px}.logo i{color:var(--ac);font-style:normal}
 .welcome{margin:12px;padding:14px;background:linear-gradient(135deg,#a78bfa,#3b82f6);border-radius:16px;color:#000}.welcome h2{font-size:19px}.welcome p{font-size:13px;margin-top:6px;font-weight:600}.welcome button{background:#000;color:#fff;border:0;padding:9px 14px;border-radius:999px;font-weight:800;margin-top:10px;font-size:13px}
 #search{margin:0 12px 8px;width:calc(100% - 24px)}
-
-/* === FIXED NAV - THIS WAS THE BUG === */
-#nav{flex:1;overflow-y:auto;padding:6px 10px 20px;display:flex;flex-direction:column;gap:6px}
-.nb{display:flex;align-items:center;width:100%;box-sizing:border-box;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#1a1a2e;color:#fff;border:1px solid #2a2a44;padding:11px 12px;border-radius:12px;font-size:14px;text-align:left;cursor:pointer}
+#nav{flex:1;overflow-y:auto;padding:8px 10px 24px;display:flex;flex-direction:column;gap:0}
+.nav-sec{padding:14px 6px 6px;font-size:11px;letter-spacing:1.2px;opacity:.6;font-weight:900;border-top:1px solid #222244;margin-top:10px}
+.nav-sec:first-child{border-top:0;margin-top:0}
+.nb{display:flex;align-items:center;width:100%;box-sizing:border-box;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#1a1a2e;color:#fff;border:1px solid #2a2a44;padding:11px 12px;border-radius:12px;font-size:14px;text-align:left;cursor:pointer;margin-bottom:6px}
 .nb:hover{background:#1c1c33}
 .nb.on,.nb.act{background:#fff;color:#000;font-weight:800}
 .ni{display:flex;align-items:center;width:100%;background:#1a1a2e;color:#fff;border:1px solid #2a2a44;padding:11px 12px;border-radius:12px;font-size:14px;cursor:pointer}
 .ni.act{background:#fff;color:#000;font-weight:800}
-
 #topbar{height:48px;flex:none;display:flex;align-items:center;gap:4px;padding:0 6px;background:#0a0a16;border-bottom:1px solid var(--ln);position:relative;z-index:50;overflow-x:auto;overflow-y:hidden;white-space:nowrap;scrollbar-width:none}#topbar::-webkit-scrollbar{display:none}
 #tt{flex:1;font-size:13px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .tb{background:#1c1c33;color:#fff;border:1px solid #333;border-radius:999px;padding:7px 9px;font-weight:800;font-size:12px;white-space:nowrap;cursor:pointer;flex:0 0 auto}.tb.pri{background:var(--ac);color:#000;border:0}
 .tb.exit{background:#ff3b30;color:#fff;border:0}
 .tb.aero{background:#111;color:#facc15;border:1px solid #facc15}
 #info{display:block}#info .card{border-color:#a78bfa}
-.bub{position:fixed;z-index:2000;bottom:16px}.bb{width:58px;height:58px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:27px;position:relative;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.5)}.bl{position:absolute;top:-8px;right:-10px;background:#000;font-size:8px;font-weight:900;padding:2px 5px;border-radius:999px;border:1px solid #fff}
+/* FIXED BUBBLES - touch-action none so drag works, bottom cleared when dragging */
+.bub{position:fixed;z-index:2000;bottom:16px;touch-action:none}
+.bb{width:58px;height:58px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:27px;position:relative;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.5);touch-action:none;user-select:none}
+.bl{position:absolute;top:-8px;right:-10px;background:#000;font-size:8px;font-weight:900;padding:2px 5px;border-radius:999px;border:1px solid #fff;pointer-events:none}
 .pop{position:fixed;z-index:2002;bottom:86px;width:290px;max-width:92vw;background:#111118;border-radius:20px;padding:14px;display:none;box-shadow:0 20px 60px rgba(0,0,0,.8)}.pop.open{display:block}
 #cp{left:12px;border:2px solid #22d3ee}#choice{right:12px;border:2px solid var(--ac)}.pop h3{font-size:16px}.pop p{font-size:12px;opacity:.7;margin:6px 0}.pop button{width:100%;margin-top:8px;padding:11px;border-radius:14px;font-weight:900;border:0;text-align:left;cursor:pointer}.pop small{display:block;font-weight:400;opacity:.7;font-size:11px}
 #cans{background:#000;border:1px solid #333;border-radius:12px;padding:10px;font-size:13px;line-height:1.5;white-space:pre-line;min-height:56px;max-height:160px;overflow-y:auto;margin-bottom:8px}
@@ -54,16 +56,18 @@ input[type=range]{accent-color:var(--ac);padding:0;height:28px}
 .fh{background:#1a1a2e;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:13px}.fh button{background:#fff;color:#000;border:0;border-radius:999px;padding:6px 10px;font-weight:900}
 #cin{background:#000;border:0;font-size:26px;text-align:right;border-radius:0}#cres{text-align:right;padding:4px 14px;opacity:.7;background:#000;min-height:24px}
 #keys{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px}#keys button{height:42px;border-radius:14px;background:#1e1e2e;color:#fff;border:1px solid #2a2a44;font-weight:800;font-size:16px}
-#collapsed{position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:100;text-align:center;padding:20px}#collapsed.show{display:flex}
 #toast{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:12px 16px;border-radius:12px;font-weight:800;font-size:13px;z-index:3000;display:none;max-width:90%}
 #toast.show{display:block}
 #rush{margin-top:10px;background:#131322;border:2px solid #facc15;border-radius:16px;padding:12px;display:none}
 #rush h3{color:#facc15;font-size:15px}#rush .timer{height:10px;background:#222;border-radius:999px;overflow:hidden;margin:8px 0}#rush .tfill{height:100%;background:#22d3ee;width:100%}
 #rush .ans{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}#rush .ans button{padding:12px;border-radius:12px;background:#fff;color:#000;font-weight:900;font-size:18px;border:0}
 @media(min-width:900px){#panel,#fv{max-width:760px;margin:0 auto;width:100%}}
-html.is-minimized, body.is-minimized{background:transparent !important}
+/* FIXED MINIMIZE - dark, NOT transparent (transparent = white screen), NOT black-screen div */
+html.is-minimized, body.is-minimized{background:#07070f !important}
 body.is-minimized #main, body.is-minimized #sidebar{display:none !important}
-body.is-minimized #collapsed{display:none !important}
+body.is-minimized .bub{display:flex !important}
+body.is-minimized .pop, body.is-minimized #fcalc{display:none}
+body.is-minimized .pop.open, body.is-minimized #fcalc.open{display:block !important}
 #aeroModal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:5000;display:none;align-items:center;justify-content:center;padding:16px}
 #aeroModal.open{display:flex}
 #aeroBox{background:#111118;border:2px solid #facc15;border-radius:16px;width:100%;max-width:420px;max-height:85vh;overflow:auto;padding:16px}
@@ -82,7 +86,7 @@ body.is-minimized #collapsed{display:none !important}
 <div class="card" id="chal"><h3>Daily challenge • <span id="st">streak 0</span></h3><p id="cq"></p><input id="ca" type="number" inputmode="decimal" placeholder="Your answer"><button onclick="checkQ()">Check</button><button onclick="newQ()">New question</button><p id="cf"></p></div></div>
 <div id="fv"><button class="go" onclick="select(cur)">← Back to topics</button><div class="card"><h3>Quick calculator</h3><input id="ci" placeholder="12*8 + sqrt(81)"><p id="cr" style="font-size:22px;font-weight:900;margin-top:6px"></p></div><div class="card"><h3>Formula lab — with working</h3><select id="fsel"></select><div id="fin"></div><div class="box" id="fres"></div></div></div>
 </div>
-<div id="collapsed"><div><div style="font-size:48px">🧮</div><h1 style="font-size:24px;margin:12px 0">MATH LAB MINIMIZED<br><span style="color:var(--ac)">MATH WAITER IS WAITING</span></h1><p style="opacity:.6">∑ Math Buddy left, Math Waiter 🧮 right.</p><button class="go" style="margin-top:12px" onclick="maxApp()">↗ Reopen entire app</button><button class="go" style="margin-top:8px;background:#ff3b30;color:#fff" onclick="exitApp()">✕ EXIT APP</button></div></div>
+<!-- #collapsed DELETED - this was the black screen. Minimize now = dark bg + bubbles only -->
 <div class="bub" id="cw" style="left:12px"><div class="bb" style="background:#22d3ee;font-weight:900" onclick="openBuddy()">∑<span class="bl">MATH BUDDY</span></div></div>
 <div class="bub" id="ww" style="right:12px"><div class="bb" style="background:#a78bfa" onclick="openChoice()">🧮<span class="bl">MATH WAITER</span></div></div>
 <div class="pop" id="cp"><h3>∑ Math Buddy</h3><p>I explain and help.</p><div id="cans">Hi! Pick a topic, then ask me.</div><input id="cask" placeholder="why? real life? quiz me, jargon?"><button style="background:#22d3ee;color:#000" onclick="askBuddy()">Ask Math Buddy</button><button style="background:#1c1c33;color:#fff" onclick="$('cp').classList.remove('open')">Close</button><button style="background:#ff3b30;color:#fff" onclick="exitApp()">✕ EXIT APP - Remove Bubbles</button><button style="background:#111;color:#facc15;border:1px solid #facc15" onclick="aeroTap()">[Errors: 0] Send Log</button></div>
@@ -93,7 +97,7 @@ body.is-minimized #collapsed{display:none !important}
 <div id="app-closed"><div style="font-size:50px">🧮</div><h2>Math Lab Closed</h2><p>Floating bubbles removed.</p><button onclick="reopenAfterExit()" style="background:#6A11CB;color:white;border:none;padding:12px 24px;border-radius:25px;font-size:16px;font-weight:bold;">Reopen Math Lab</button></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-// ===== AEROLOG - FIXED, NO STRAY BRACE =====
+	// ===== AEROLOG =====
 const AERO_EMAIL = "vireshsingh26@protonmail.com";
 let aeroLogs = [];
 try{ aeroLogs = JSON.parse(localStorage.getItem('wavelord_aerolog')||'[]') || []; }catch(e){ aeroLogs=[]; }
@@ -129,7 +133,8 @@ function aeroSend(){
   alert('Log copied + email opened to '+AERO_EMAIL);
 }
 window.addEventListener('error', e=>{ aeroAdd((e.message||'JS Error')+' @ line '+(e.lineno||''), 'js'); });
-window.addEventListener('unhandledrejection', e=>{ aeroAdd('Promise: '+String(e.reason), 'promise'); });const $=id=>document.getElementById(id),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+window.addEventListener('unhandledrejection', e=>{ aeroAdd('Promise: '+String(e.reason), 'promise'); });
+const $=id=>document.getElementById(id),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const NS=[1,2,4,12,365,100000];
 let cur='add',p={},auto=true,drag=false,yaw=.6,pitch=.5,dist=10,ds=10,ctr=[0,1.5,0],cs=[0,1.5,0],anim=null,last=[],t0=0,sineT=0,negCur=0,ch=null,streak=0,studioT=0;
 let lorenz={x:0.1,y:0,z:0,pts:[],paused:false},voro={pts:[],sel:-1,drag:false},cym={t:0,paused:false,rotX:-0.55,rotY:0.35,palette:'purple',geom:'surface'};
@@ -173,7 +178,8 @@ lorenz:{i:'🦋',n:'Lorenz Butterfly',k:2,eq:'dx/dt = σ(y−x), dy/dt = x(ρ−
 voronoi:{i:'🗺️',n:'Voronoi Worlds',k:2,eq:'d(P,A) = √[(x−xₐ)² + (y−yₐ)²]',explain:'WHAT: Every point claims space closest to it.',why:'WHY: Border is halfway between two centres.',real:'WHO: Map maker, phone towers, hospitals.',jargon:'JARGON: VORONOI = closest-point map. SITE = centre dot. CELL = territory. d(P,A) = distance.',try:'TRY: Drag a dot, tap empty to add.',sl:[['count','Number of territories',5,100,1,32],['color','Color variation',0,100,1,70]],q:null,go(p){return['Voronoi — '+((p.count||32))+' territories','🗺️ Voronoi']}},
 cymatics:{i:'🌊',n:'Cymatics World',k:2,eq:'z(x,y,t) = A sin(kₓx) sin(kᵧy) cos(ωt)  •  k = 2πf / v',explain:'WHAT: When sound becomes geometry. Plate vibrates, sand settles on still places.',why:'WHY: Wave = sin X TIMES sin Y. Where either = 0, whole = 0 — NODE.',real:'WHO: Hans Jenny, Chladni 1787, speaker makers, doctors (ultrasound).',jargon:'JARGON: A = AMPLITUDE = how TALL. f = FREQUENCY. k = 2πf / v. ω (omega) = how fast it wiggles. NODE = still place. ANTINODE = most movement. STANDING WAVE = looks still, just breathing.',try:'TRY: fx=1,fy=1 = one bump. fx=8,fy=8 = checkerboard. Geometry: Surface → Nodes → Contours.',sl:[['fx','X frequency fx — bumps across',1,12,1,3],['fy','Y frequency fy — bumps down',1,12,1,4],['amp','Wave amplitude A — how tall',0.1,2.5,.1,1],['speed','Animation speed',0,3,.1,1]],q:null,go(p){return['Cymatics '+p.fx+' × '+p.fy+' — standing waves','🌊 Cymatics']}},
 };
-Object.assign(T,STUDIO);const stage=$('stage'),scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(50,1,.1,500),renderer=new THREE.WebGLRenderer({antialias:true});
+Object.assign(T,STUDIO);
+const stage=$('stage'),scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(50,1,.1,500),renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));stage.insertBefore(renderer.domElement,stage.firstChild);
 scene.background=new THREE.Color(0x07070f);scene.add(new THREE.AmbientLight(0x9a8bff,.8));let dl=new THREE.DirectionalLight(0xffffff,1.1);dl.position.set(6,12,8);scene.add(dl);
 let grid=new THREE.GridHelper(40,40,0x333355,0x1a1a2e);grid.position.y=-.7;scene.add(grid);
@@ -213,7 +219,8 @@ function buildF(){let s=$('fsel');s.innerHTML='';F.forEach((f,i)=>s.add(new Opti
 function fInputs(){let f=F[$('fsel').value],b=$('fin');b.innerHTML='';fv={};f[3].forEach(k=>{fv[k]=2;let l=document.createElement('label'),i=document.createElement('input');l.innerText=k;i.type='number';i.value=2;i.inputMode='decimal';i.oninput=()=>{fv[k]=parseFloat(i.value)||0;fCalc()};b.append(l,i)});fCalc()}
 function fCalc(){let f=F[$('fsel').value],[r,w]=f[4](fv);$('fres').innerText=f[2]+'\nWORKING: = '+w+'\n= '+(Math.round(r*1000)/1000)}
 function showF(i){$('tt').innerText='📐 Formulas';$('stage').style.display=$('panel').style.display='none';$('fv').style.display='block';if(typeof i==='number'){$('fsel').value=i;fInputs()}if(innerWidth<=700)tSide(1);buildNav()}
-$('ci').oninput=()=>{try{let s=$('ci').value.replace(/π/g,'PI').replace(/\^/g,'**');if(!s.trim()){$('cr').innerText='';return}if(!/^(?:[\d+\-*\/().\s%]|PI|sqrt|sin|cos|tan|log)*$/.test(s))throw 0;$('cr').innerText='= '+Math.round(Function('const{PI,sqrt,sin,cos,tan,log10:log}=Math;return('+s+')')()*1e6)/1e6}catch(e){$('cr').innerText='...'}};let dpr=1,lorRot={x:-0.35,y:0.35};
+$('ci').oninput=()=>{try{let s=$('ci').value.replace(/π/g,'PI').replace(/\^/g,'**');if(!s.trim()){$('cr').innerText='';return}if(!/^(?:[\d+\-*\/().\s%]|PI|sqrt|sin|cos|tan|log)*$/.test(s))throw 0;$('cr').innerText='= '+Math.round(Function('const{PI,sqrt,sin,cos,tan,log10:log}=Math;return('+s+')')()*1e6)/1e6}catch(e){$('cr').innerText='...'}};
+let dpr=1,lorRot={x:-0.35,y:0.35};
 function voroGen(cnt){voro.pts=[];let W=$('c2').width/dpr||400,H=$('c2').height/dpr||300;for(let i=0;i<cnt;i++)voro.pts.push({x:25+Math.random()*(W-50),y:25+Math.random()*(H-50)});}
 function isPrime(n){if(n<2)return false;for(let i=2;i*i<=n;i++)if(n%i===0)return false;return true;}
 function drawUnitCircle(x,W,H,angDeg){let cx=W/2,cy=H/2,sc=Math.min(W,H)/4.2,th=angDeg*Math.PI/180,px=cx+Math.cos(th)*sc,py=cy-Math.sin(th)*sc;x.strokeStyle='#fff';x.lineWidth=2;x.beginPath();x.arc(cx,cy,sc,0,6.3);x.stroke();x.strokeStyle='#444';x.beginPath();x.moveTo(cx-sc-20,cy);x.lineTo(cx+sc+20,cy);x.moveTo(cx,cy-sc-20);x.lineTo(cx,cy+sc+20);x.stroke();x.strokeStyle='#4cc9f0';x.lineWidth=5;x.beginPath();x.moveTo(cx,cy);x.lineTo(px,cy);x.stroke();x.strokeStyle='#f72585';x.lineWidth=5;x.beginPath();x.moveTo(px,cy);x.lineTo(px,py);x.stroke();x.strokeStyle='#fff';x.lineWidth=3;x.beginPath();x.moveTo(cx,cy);x.lineTo(px,py);x.stroke();x.fillStyle='#ffd166';x.beginPath();x.arc(px,py,8,0,6.3);x.fill();x.fillStyle='#4cc9f0';x.textAlign='left';x.fillText('cos = '+Math.cos(th).toFixed(3)+' ← BLUE across',14,H-28);x.fillStyle='#f72585';x.fillText('sin = '+Math.sin(th).toFixed(3)+' ← PINK up',14,H-10);}
@@ -391,7 +398,7 @@ function buildNav(){
   let nav=$('nav'); nav.innerHTML='';
   let groups=[['🧮 MATH TOPICS',['add','sub','mul','div','pyt','neg','unit','eul','sin','cyl','cone','sphVol','cuboid','pyr','primes','tables','circle','fractions','perimeter','percent','angles','factors','surface','speed','money','stats']],['🎨 STUDIO',['eulerViz','fibFlower','sunflower','sinphoney','galaxy','roseMorph','lorenz','voronoi','cymatics']]];
   groups.forEach(([title,keys])=>{
-    let h=document.createElement('div'); h.style.cssText='padding:10px 10px 4px;font-size:11px;letter-spacing:1px;opacity:.6;font-weight:900'; h.innerText=title; nav.appendChild(h);
+    let h=document.createElement('div'); h.className='nav-sec'; h.innerText=title; nav.appendChild(h);
     keys.forEach(id=>{
       if(!T[id]) return;
       let b=document.createElement('button'); b.className='nb'+(id===cur?' on':''); b.innerText=T[id].i+' '+T[id].n; b.onclick=()=>{select(id); if(innerWidth<=700) tSide(1)}; nav.appendChild(b);
@@ -400,14 +407,14 @@ function buildNav(){
 }
 function tSide(force){let s=$('sidebar'); if(force!==undefined){ s.classList.toggle('hidden',!!force); } else { s.classList.toggle('hidden'); }}
 function toast(msg){let t=$('toast'); t.innerText=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200);}
-function showF(i){$('tt').innerText='📐 Formulas';$('stage').style.display=$('panel').style.display='none';$('fv').style.display='block';if(typeof i==='number'){$('fsel').value=i;fInputs()}if(innerWidth<=700)tSide(1);buildNav();}
 function calcOpen(){$('fcalc').classList.add('open'); cLive();}
 function cLive(){try{let s=$('cin').value.replace(/π/g,'PI').replace(/\^/g,'**'); if(!s.trim()){$('cres').innerText='';return} if(!/^(?:[\d+\-*\/().\s%]|PI|sqrt|sin|cos|tan|log)*$/.test(s)) throw 0; $('cres').innerText='= '+Math.round(Function('const{PI,sqrt,sin,cos,tan,log10:log}=Math;return('+s+')')()*1e6)/1e6;}catch(e){$('cres').innerText='...';}}
 (function(){let keys='789/456*123-0.+=';let k=$('keys'); if(!k) return; k.innerHTML=''; [...keys].forEach(ch=>{let b=document.createElement('button'); b.innerText=ch; b.onclick=()=>{ if(ch==='='){cLive(); return} $('cin').value+=ch; cLive(); }; k.appendChild(b);}); let c=document.createElement('button'); c.innerText='C'; c.onclick=()=>{$('cin').value=''; cLive();}; k.appendChild(c); })();
+
+// --- FIXED MIN / MAX / EXIT - ONE copy only, no overrides ---
 function minApp(){
   document.body.classList.add('is-minimized');
   document.documentElement.classList.add('is-minimized');
-  $('collapsed').style.display='none';
   $('cp').classList.remove('open'); $('choice').classList.remove('open'); $('fcalc').classList.remove('open');
   $('cw').style.display='flex'; $('ww').style.display='flex';
   toast('Minimized — Buddy left, Waiter right');
@@ -415,12 +422,12 @@ function minApp(){
 function maxApp(){
   document.body.classList.remove('is-minimized');
   document.documentElement.classList.remove('is-minimized');
-  $('collapsed').style.display='none';
   $('cp').classList.remove('open'); $('choice').classList.remove('open'); $('app-closed').style.display='none';
+  // FIXED 3D: stage was 0x0 while hidden - resize + redraw or 3D stays blank
+  setTimeout(()=>{ try{ resize(); select(cur); }catch(e){ aeroAdd('maxApp: '+e.message); } }, 80);
 }
 function exitApp(){
   document.body.classList.add('is-minimized');
-  $('collapsed').style.display='none';
   $('cp').classList.remove('open'); $('choice').classList.remove('open'); $('fcalc').classList.remove('open');
   $('app-closed').style.display='flex'; $('cw').style.display='none'; $('ww').style.display='none';
 }
@@ -428,40 +435,77 @@ function reopenAfterExit(){maxApp(); select(cur); toast('Welcome back!');}
 function justCalc(){
   $('choice').classList.remove('open'); $('app-closed').style.display='none';
   document.body.classList.add('is-minimized'); document.documentElement.classList.add('is-minimized');
-  $('collapsed').style.display='none'; calcOpen();
+  calcOpen();
 }
-function openBuddy(){let cp=$('cp'); cp.classList.toggle('open'); if(cp.classList.contains('open')){$('cans').innerHTML='<b>∑ Math Buddy:</b> Hi! I am here. Ask me about <b>'+(T[cur]?T[cur].n:cur)+'</b> — type "why", "real life", "quiz me" or "jargon".';}}
-function openChoice(){$('choice').classList.toggle('open');}
-function askBuddy(){
-  let q=$('cask').value.trim().toLowerCase(); if(!q) return;
+function openBuddy(){
+  // if we just dragged, do NOT open - this was why tap-after-drag felt broken
+  if($('cw').dataset.moved==='1') return;
+  let cp=$('cp'); cp.classList.toggle('open'); if(cp.classList.contains('open')){$('cans').innerHTML='<b>∑ Math Buddy:</b> Hi! I am here. Ask me about <b>'+(T[cur]?T[cur].n:cur)+'</b> — type "why", "real life", "quiz me" or "jargon".';}
+}
+function openChoice(){
+  if($('ww').dataset.moved==='1') return;
+  $('choice').classList.toggle('open');
+}
+
+// --- FIXED BUDDY - ONE copy, AI first, local fallback if AI fails ---
+async function askBuddy(){
+  let inp=$('cask'); let raw=inp.value.trim(); if(!raw) return;
   let t=T[cur]||T['add'];
-  let ans='';
-  if(q.includes('why')||q.includes('how')) ans=t.why||'Look at the visual — it shows why.';
-  else if(q.includes('real')||q.includes('life')||q.includes('use')||q.includes('job')) ans=t.real||'Used every day.';
-  else if(q.includes('jargon')||q.includes('word')||q.includes('mean')) ans=t.jargon||'No jargon for this one.';
-  else if(q.includes('try')||q.includes('example')) ans=t.try||'Try moving the sliders.';
-  else if(q.includes('quiz')||q.includes('test')||q.includes('question')){ newQ(); ans='Quiz: '+(ch?ch[0]+' — type your answer in the Daily Challenge box below.':'Try the Daily Challenge below.'); }
-  else if(q.includes('formula')||q.includes('equation')) ans='Formula: '+t.eq;
-  else if(q.includes('hi')||q.includes('hello')||q.includes('hey')) ans='Hi! Ask me "why", "real life", "jargon", "quiz me" or "formula" about '+t.n+'.';
-  else ans='Good question! For '+t.n+': '+(t.explain||'').split('\n')[0]+' — try asking "why", "real life", "jargon" or "quiz me".';
-  $('cans').innerHTML='<b>You:</b> '+$('cask').value+'<br><br><b>∑ Buddy:</b> '+ans;
-  $('cask').value='';
+  $('cans').innerHTML='<b>You:</b> '+raw+'<br><br><b>∑ Buddy:</b> Thinking...'; inp.value='';
+  try{
+    let r=await fetch('/.netlify/functions/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({persona:'buddy',question:raw,topic:t.n})});
+    let d=await r.json(); if(d.error) throw new Error(d.error);
+    $('cans').innerHTML='<b>You:</b> '+raw+'<br><br><b>∑ Buddy:</b> '+String(d.answer).replace(/\n/g,'<br>');
+  }catch(e){
+    // Local fallback - never blank, never crashes
+    let q=raw.toLowerCase(), ans='';
+    if(q.includes('why')||q.includes('how')) ans=t.why||'Look at the visual — it shows why.';
+    else if(q.includes('real')||q.includes('life')||q.includes('use')||q.includes('job')) ans=t.real||'Used every day.';
+    else if(q.includes('jargon')||q.includes('word')||q.includes('mean')) ans=t.jargon||'No jargon for this one.';
+    else if(q.includes('try')||q.includes('example')) ans=t.try||'Try moving the sliders.';
+    else if(q.includes('quiz')||q.includes('test')||q.includes('question')){ newQ(); ans='Quiz: '+(ch?ch[0]:'Try the Daily Challenge below.'); }
+    else if(q.includes('formula')||q.includes('equation')) ans='Formula: '+t.eq;
+    else if(q.includes('hi')||q.includes('hello')||q.includes('hey')) ans='Hi! Ask me "why", "real life", "jargon", "quiz me" or "formula" about '+t.n+'.';
+    else ans='Good question! For '+t.n+': '+(t.explain||'').split('\n')[0]+' — try asking "why", "real life", "jargon" or "quiz me".<br><br><small>AI offline: '+e.message+'</small>';
+    $('cans').innerHTML='<b>You:</b> '+raw+'<br><br><b>∑ Buddy:</b> '+ans;
+  }
 }
+
+// --- FIXED DRAG - ONE copy, bottom cleared, tap vs drag separated ---
 function makeDraggable(el){
-  let sx=0,sy=0,dx=0,dy=0,dragging=false,moved=false;
-  let startX=0,startY=0;
-  el.addEventListener('pointerdown',e=>{dragging=true;moved=false;startX=e.clientX;startY=e.clientY;sx=e.clientX-el.getBoundingClientRect().left;sy=e.clientY-el.getBoundingClientRect().top;el.setPointerCapture(e.pointerId);});
-  el.addEventListener('pointermove',e=>{if(!dragging)return;let nx=e.clientX-sx,ny=e.clientY-sy;if(Math.abs(e.clientX-startX)>6||Math.abs(e.clientY-startY)>6)moved=true;el.style.left=Math.max(0,Math.min(innerWidth-70,nx))+'px';el.style.top=Math.max(0,Math.min(innerHeight-70,ny))+'px';el.style.right='auto';});
-  el.addEventListener('pointerup',()=>{dragging=false; if(moved){setTimeout(()=>{el.dataset.moved='1'; setTimeout(()=>el.dataset.moved='',300)},0);}});
-  el.addEventListener('click',e=>{if(el.dataset.moved==='1'){e.stopPropagation();e.preventDefault();}});
+  let sx=0,sy=0,dragging=false,moved=false,startX=0,startY=0;
+  el.addEventListener('pointerdown',e=>{
+    dragging=true; moved=false; el.dataset.moved='';
+    startX=e.clientX; startY=e.clientY;
+    sx=e.clientX-el.getBoundingClientRect().left; sy=e.clientY-el.getBoundingClientRect().top;
+    try{ el.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  el.addEventListener('pointermove',e=>{
+    if(!dragging) return;
+    if(Math.abs(e.clientX-startX)>6 || Math.abs(e.clientY-startY)>6) moved=true;
+    if(!moved) return;
+    el.style.left=Math.max(0,Math.min(innerWidth-70,e.clientX-sx))+'px';
+    el.style.top=Math.max(0,Math.min(innerHeight-70,e.clientY-sy))+'px';
+    el.style.bottom='auto'; // FIX: bottom was still 16px, fighting top - drag snapped back
+    el.style.right='auto';
+  });
+  function endDrag(){
+    if(!dragging) return; dragging=false;
+    if(moved){ el.dataset.moved='1'; setTimeout(()=>{ el.dataset.moved=''; },350); }
+  }
+  el.addEventListener('pointerup',endDrag);
+  el.addEventListener('pointercancel',endDrag);
 }
+
+// --- FIXED ANIMATE + RESIZE - 3D renders, no 0x0 ---
 function animate(){
   requestAnimationFrame(animate);
+  if(document.body.classList.contains('is-minimized')) return; // don't render while hidden - keeps size sane
   let t=T[cur];
   if(t && t.k===3){
     let now=performance.now(),e=(now-t0)/1000;
     if(marbles.length){marbles.forEach(m=>{let u=m.userData,d=cl((e*1000-u.d)/800,0,1),ee=1-Math.pow(1-d,3);m.position.set(u.fx+(u.tx-u.fx)*ee,u.fy+(u.ty-u.fy)*ee,u.fz+(u.tz-u.fz)*ee);});}
-    solid.rotation.y+=auto?.004:0;
+    if(auto) solid.rotation.y+=0.004;
     cs[0]+=(ctr[0]-cs[0])*.08; cs[1]+=(ctr[1]-cs[1])*.08; cs[2]+=(ctr[2]-cs[2])*.08;
     ds+=(dist-ds)*.08;
     camera.position.set(cs[0]+Math.sin(yaw)*Math.cos(pitch)*ds,cs[1]+Math.sin(pitch)*ds,cs[2]+Math.cos(yaw)*Math.cos(pitch)*ds);
@@ -471,6 +515,7 @@ function animate(){
 }
 function resize(){
   let w=stage.clientWidth,h=Math.max(320,stage.clientHeight);
+  if(!w || w<10) return; // FIX: never set renderer to 0x0 while minimized
   renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix();
   let c=$('c2'); dpr=Math.min(devicePixelRatio||1,2); c.width=w*dpr; c.height=h*dpr; c.style.width=w+'px'; c.style.height=h+'px';
 }
@@ -500,32 +545,5 @@ document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.activeEleme
 makeDraggable($('cw')); makeDraggable($('ww'));
 buildF(); resize(); buildNav(); select('add'); animate(); aeroUpdateBadge();
 </script>
-<script>
-// ONE-PASTE FIX - overrides broken min / AI / drag
-async function askBuddy(){
-  let inp=document.getElementById('cask'); let raw=inp.value.trim(); if(!raw) return;
-  let t=T[cur]||T['add'];
-  document.getElementById('cans').innerHTML='<b>You:</b> '+raw+'<br><br><b>∑ Buddy:</b> Thinking...'; inp.value='';
-  try{
-    let r=await fetch('/.netlify/functions/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({persona:'buddy',question:raw,topic:t.n})});
-    let d=await r.json(); if(d.error) throw new Error(d.error);
-    document.getElementById('cans').innerHTML='<b>You:</b> '+raw+'<br><br><b>∑ Buddy:</b> '+d.answer.replace(/\n/g,'<br>');
-  }catch(e){ document.getElementById('cans').innerHTML='⚠️ '+e.message+' — check netlify/functions/ai.js + GROQ_API_KEY + redeploy'; }
-}
-function minApp(){
-  document.body.classList.add('is-minimized'); document.documentElement.classList.add('is-minimized');
-  document.getElementById('collapsed').style.display='none';
-  document.getElementById('cw').style.display='flex'; document.getElementById('ww').style.display='flex';
-}
-function maxApp(){
-  document.body.classList.remove('is-minimized'); document.documentElement.classList.remove('is-minimized');
-  document.getElementById('collapsed').style.display='none';
-}
-</script>
-<style>
-html.is-minimized,body.is-minimized{background:transparent !important;}
-body.is-minimized #main,body.is-minimized #sidebar{display:none !important;}
-body.is-minimized #collapsed{display:none !important;}
-</style>
 </body>
   </html>
