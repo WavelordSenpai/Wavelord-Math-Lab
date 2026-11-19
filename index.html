@@ -404,11 +404,32 @@ function showF(i){$('tt').innerText='📐 Formulas';$('stage').style.display=$('
 function calcOpen(){$('fcalc').classList.add('open'); cLive();}
 function cLive(){try{let s=$('cin').value.replace(/π/g,'PI').replace(/\^/g,'**'); if(!s.trim()){$('cres').innerText='';return} if(!/^(?:[\d+\-*\/().\s%]|PI|sqrt|sin|cos|tan|log)*$/.test(s)) throw 0; $('cres').innerText='= '+Math.round(Function('const{PI,sqrt,sin,cos,tan,log10:log}=Math;return('+s+')')()*1e6)/1e6;}catch(e){$('cres').innerText='...';}}
 (function(){let keys='789/456*123-0.+=';let k=$('keys'); if(!k) return; k.innerHTML=''; [...keys].forEach(ch=>{let b=document.createElement('button'); b.innerText=ch; b.onclick=()=>{ if(ch==='='){cLive(); return} $('cin').value+=ch; cLive(); }; k.appendChild(b);}); let c=document.createElement('button'); c.innerText='C'; c.onclick=()=>{$('cin').value=''; cLive();}; k.appendChild(c); })();
-function minApp(){document.body.classList.add('min'); $('collapsed').style.display='flex'; $('cw').style.display='flex'; $('ww').style.display='flex'; toast('Minimized — Math Buddy left, Math Waiter right');}
-function maxApp(){document.body.classList.remove('min'); $('collapsed').style.display='none'; $('cp').classList.remove('open'); $('choice').classList.remove('open'); $('app-closed').style.display='none';}
-function exitApp(){document.body.classList.add('min'); $('collapsed').style.display='none'; $('cp').classList.remove('open'); $('choice').classList.remove('open'); $('fcalc').classList.remove('open'); $('app-closed').style.display='flex'; $('cw').style.display='none'; $('ww').style.display='none'; toast('Closed — tap Reopen to bring it back');}
+function minApp(){
+  document.body.classList.add('is-minimized');
+  document.documentElement.classList.add('is-minimized');
+  $('collapsed').style.display='none';
+  $('cp').classList.remove('open'); $('choice').classList.remove('open'); $('fcalc').classList.remove('open');
+  $('cw').style.display='flex'; $('ww').style.display='flex';
+  toast('Minimized — Buddy left, Waiter right');
+}
+function maxApp(){
+  document.body.classList.remove('is-minimized');
+  document.documentElement.classList.remove('is-minimized');
+  $('collapsed').style.display='none';
+  $('cp').classList.remove('open'); $('choice').classList.remove('open'); $('app-closed').style.display='none';
+}
+function exitApp(){
+  document.body.classList.add('is-minimized');
+  $('collapsed').style.display='none';
+  $('cp').classList.remove('open'); $('choice').classList.remove('open'); $('fcalc').classList.remove('open');
+  $('app-closed').style.display='flex'; $('cw').style.display='none'; $('ww').style.display='none';
+}
 function reopenAfterExit(){maxApp(); select(cur); toast('Welcome back!');}
-function justCalc(){$('choice').classList.remove('open'); $('app-closed').style.display='none'; document.body.classList.add('min'); $('collapsed').style.display='none'; calcOpen();}
+function justCalc(){
+  $('choice').classList.remove('open'); $('app-closed').style.display='none';
+  document.body.classList.add('is-minimized'); document.documentElement.classList.add('is-minimized');
+  $('collapsed').style.display='none'; calcOpen();
+}
 function openBuddy(){let cp=$('cp'); cp.classList.toggle('open'); if(cp.classList.contains('open')){$('cans').innerHTML='<b>∑ Math Buddy:</b> Hi! I am here. Ask me about <b>'+(T[cur]?T[cur].n:cur)+'</b> — type "why", "real life", "quiz me" or "jargon".';}}
 function openChoice(){$('choice').classList.toggle('open');}
 function askBuddy(){
@@ -439,7 +460,7 @@ function animate(){
   let t=T[cur];
   if(t && t.k===3){
     let now=performance.now(),e=(now-t0)/1000;
-    if(marbles.length){marbles.forEach(m=>{let u=m.userData,d=cl((e*1000-u.d)/800,0,1),ee=1-Math.pow(1-d,3);m.position.set(u.fx+(u.tx-u.fx)*ee,u.fy+(u.ty-u.fy)*ee,u.fz+(u.tz-u.fz)*ee);if(m.userData.ty!==undefined&&d>=1)m.position.y+=Math.sin(now/400+m.position.x)*.08;});}
+    if(marbles.length){marbles.forEach(m=>{let u=m.userData,d=cl((e*1000-u.d)/800,0,1),ee=1-Math.pow(1-d,3);m.position.set(u.fx+(u.tx-u.fx)*ee,u.fy+(u.ty-u.fy)*ee,u.fz+(u.tz-u.fz)*ee);});}
     solid.rotation.y+=auto?.004:0;
     cs[0]+=(ctr[0]-cs[0])*.08; cs[1]+=(ctr[1]-cs[1])*.08; cs[2]+=(ctr[2]-cs[2])*.08;
     ds+=(dist-ds)*.08;
@@ -479,5 +500,32 @@ document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.activeEleme
 makeDraggable($('cw')); makeDraggable($('ww'));
 buildF(); resize(); buildNav(); select('add'); animate(); aeroUpdateBadge();
 </script>
+<script>
+// ONE-PASTE FIX - overrides broken min / AI / drag
+async function askBuddy(){
+  let inp=document.getElementById('cask'); let raw=inp.value.trim(); if(!raw) return;
+  let t=T[cur]||T['add'];
+  document.getElementById('cans').innerHTML='<b>You:</b> '+raw+'<br><br><b>∑ Buddy:</b> Thinking...'; inp.value='';
+  try{
+    let r=await fetch('/.netlify/functions/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({persona:'buddy',question:raw,topic:t.n})});
+    let d=await r.json(); if(d.error) throw new Error(d.error);
+    document.getElementById('cans').innerHTML='<b>You:</b> '+raw+'<br><br><b>∑ Buddy:</b> '+d.answer.replace(/\n/g,'<br>');
+  }catch(e){ document.getElementById('cans').innerHTML='⚠️ '+e.message+' — check netlify/functions/ai.js + GROQ_API_KEY + redeploy'; }
+}
+function minApp(){
+  document.body.classList.add('is-minimized'); document.documentElement.classList.add('is-minimized');
+  document.getElementById('collapsed').style.display='none';
+  document.getElementById('cw').style.display='flex'; document.getElementById('ww').style.display='flex';
+}
+function maxApp(){
+  document.body.classList.remove('is-minimized'); document.documentElement.classList.remove('is-minimized');
+  document.getElementById('collapsed').style.display='none';
+}
+</script>
+<style>
+html.is-minimized,body.is-minimized{background:transparent !important;}
+body.is-minimized #main,body.is-minimized #sidebar{display:none !important;}
+body.is-minimized #collapsed{display:none !important;}
+</style>
 </body>
-                                                    </html>
+  </html>
