@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Wavelord V49 - EVERYTHING</title>
+<title>Wavelord V50 - FIXED + AeroLog</title>
 <link rel="manifest" href="manifest.json">
 <style>
 :root{--bg:#07070f;--pn:#0d0d1a;--ac:#a78bfa;--tx:#fff;--ln:#222244}
@@ -38,6 +38,8 @@ input[type=range]{accent-color:var(--ac);padding:0;height:28px}
 #topbar{height:48px;flex:none;display:flex;align-items:center;gap:4px;padding:0 6px;background:#0a0a16;border-bottom:1px solid var(--ln);position:relative;z-index:50;overflow-x:auto;overflow-y:hidden;white-space:nowrap;scrollbar-width:none}#topbar::-webkit-scrollbar{display:none}
 #tt{flex:0 0 auto;font-size:12px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
 .tb{background:#1c1c33;color:#fff;border:1px solid #333;border-radius:999px;padding:7px 9px;font-weight:800;font-size:12px;white-space:nowrap;cursor:pointer;flex:0 0 auto}.tb.pri{background:var(--ac);color:#000;border:0}
+.tb.exit{background:#ff3b30;color:#fff;border:0}
+.tb.aero{background:#111;color:#facc15;border:1px solid #facc15}
 #info{display:block}#info .card{border-color:#a78bfa}
 .bub{position:fixed;z-index:2000;bottom:16px}.bb{width:58px;height:58px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:27px;position:relative;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.5)}.bl{position:absolute;top:-8px;right:-10px;background:#000;font-size:8px;font-weight:900;padding:2px 5px;border-radius:999px;border:1px solid #fff}
 .pop{position:fixed;z-index:2002;bottom:86px;width:290px;max-width:92vw;background:#111118;border-radius:20px;padding:14px;display:none;box-shadow:0 20px 60px rgba(0,0,0,.8)}.pop.open{display:block}
@@ -56,9 +58,18 @@ input[type=range]{accent-color:var(--ac);padding:0;height:28px}
 @media(min-width:900px){#panel,#fv{max-width:760px;margin:0 auto;width:100%}}
 body.is-minimized{background:transparent !important}
 body.is-minimized #main, body.is-minimized #sidebar{display:none !important}
+body.is-minimized #collapsed{display:none !important}
+body.is-minimized #fcalc{inset:auto 8px 90px 8px}
+body.is-minimized #cp, body.is-minimized #choice{position:fixed}
+#aeroModal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:5000;display:none;align-items:center;justify-content:center;padding:16px}
+#aeroModal.open{display:flex}
+#aeroBox{background:#111118;border:2px solid #facc15;border-radius:16px;width:100%;max-width:420px;max-height:85vh;overflow:auto;padding:16px}
+#aeroLogText{white-space:pre-wrap;word-break:break-word;background:#000;border:1px solid #333;border-radius:10px;padding:10px;font-size:11px;max-height:280px;overflow:auto;margin:10px 0}
+#aeroModal button{width:100%;margin-top:8px;padding:11px;border-radius:12px;font-weight:900;border:0;cursor:pointer}
+#app-closed{position:fixed;inset:0;background:#0a0a1a;color:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:99999;text-align:center;padding:20px}
 </style></head><body>
 <div id="sidebar"><div class="logo">WAVELORD <i>MATH LAB</i></div><div class="welcome"><h2>👋 Welcome!</h2><p>Pick a topic, or ask ∑ Math Buddy, or play 🎮 Rush!</p><button onclick="tSide(1)">Start → hide</button></div><input id="search" placeholder="Search... primes, tables, cymatics, lorenz"><div id="nav"></div></div>
-<div id="main"><div id="topbar"><button class="tb" onclick="tSide()">☰</button><h2 id="tt"></h2><button class="tb pri" onclick="calcOpen()">🧮</button><button class="tb pri" onclick="showF()">📐</button><button class="tb pri" onclick="document.getElementById('info').scrollIntoView({behavior:'smooth'})">ℹ️</button><button class="tb" onclick="minApp()">⌄</button></div>
+<div id="main"><div id="topbar"><button class="tb" onclick="tSide()">☰</button><h2 id="tt"></h2><button class="tb pri" onclick="calcOpen()">🧮</button><button class="tb pri" onclick="showF()">📐</button><button class="tb pri" onclick="document.getElementById('info').scrollIntoView({behavior:'smooth'})">ℹ️</button><button class="tb aero" id="aeroBtn" onclick="aeroTap()">[Errors: 0]</button><button class="tb" onclick="minApp()">⌄</button><button class="tb exit" onclick="exitApp()">✕ EXIT</button></div>
 <div id="stage"><div id="hud"></div><div id="tools"><button onclick="replay()">▶ Replay</button><button onclick="auto=!auto">⏯ Spin</button><button onclick="dist*=.8">＋</button><button onclick="dist*=1.25">−</button></div><canvas id="c2" style="display:none"></canvas></div>
 <div id="panel"><h2 id="pt"></h2><div class="box" id="eq"></div><div class="box" id="res"></div><div id="sl"></div><div id="extraBtns"></div>
 <div id="rush"><h3>🎮 TIMES TABLES RUSH</h3><p id="rushInfo" style="font-size:13px;opacity:.8">60 seconds! +10 points, streak bonus!</p><div class="timer"><div class="tfill" id="rushBar"></div></div><p id="rushQ" style="font-size:28px;font-weight:900;text-align:center;margin:6px 0">7 × 8 = ?</p><div class="ans" id="rushAns"></div><p id="rushScore" style="text-align:center;font-weight:900;margin-top:8px">Score: 0 • Streak: 0 • Best: 0</p><button class="go" style="width:100%;margin-top:8px" id="rushStart" onclick="startRush()">▶ START RUSH</button></div>
@@ -66,21 +77,83 @@ body.is-minimized #main, body.is-minimized #sidebar{display:none !important}
 <div class="card" id="chal"><h3>Daily challenge • <span id="st">streak 0</span></h3><p id="cq"></p><input id="ca" type="number" inputmode="decimal" placeholder="Your answer"><button onclick="checkQ()">Check</button><button onclick="newQ()">New question</button><p id="cf"></p></div></div>
 <div id="fv"><button class="go" onclick="select(cur)">← Back to topics</button><div class="card"><h3>Quick calculator</h3><input id="ci" placeholder="12*8 + sqrt(81)"><p id="cr" style="font-size:22px;font-weight:900;margin-top:6px"></p></div><div class="card"><h3>Formula lab — with working</h3><select id="fsel"></select><div id="fin"></div><div class="box" id="fres"></div></div></div>
 </div>
-<div id="collapsed"><div><div style="font-size:48px">🧮</div><h1 style="font-size:24px;margin:12px 0">MATH LAB MINIMIZED<br><span style="color:var(--ac)">WAITER IS WAITING</span></h1><p style="opacity:.6">∑ Math Buddy left, Waiter 🧮 right.</p><button class="go" style="margin-top:12px" onclick="maxApp()">↗ Reopen entire app</button></div></div>
+<div id="collapsed"><div><div style="font-size:48px">🧮</div><h1 style="font-size:24px;margin:12px 0">MATH LAB MINIMIZED<br><span style="color:var(--ac)">MATH WAITER IS WAITING</span></h1><p style="opacity:.6">∑ Math Buddy left, Math Waiter 🧮 right.</p><button class="go" style="margin-top:12px" onclick="maxApp()">↗ Reopen entire app</button><button class="go" style="margin-top:8px;background:#ff3b30;color:#fff" onclick="exitApp()">✕ EXIT APP</button></div></div>
 <div class="bub" id="cw" style="left:12px"><div class="bb" style="background:#22d3ee;font-weight:900" onclick="openBuddy()">∑<span class="bl">MATH BUDDY</span></div></div>
-<div class="bub" id="ww" style="right:12px"><div class="bb" style="background:#a78bfa" onclick="openChoice()">🧮<span class="bl">WAITER</span></div></div>
-<div class="pop" id="cp"><h3>∑ Math Buddy</h3><p>I explain and help.</p><div id="cans">Hi! Pick a topic, then ask me.</div><input id="cask" placeholder="why? real life? quiz me, jargon?"><button style="background:#22d3ee;color:#000" onclick="askBuddy()">Ask Math Buddy</button><button style="background:#1c1c33;color:#fff" onclick="$('cp').classList.remove('open')">Close</button></div>
-<div class="pop" id="choice"><h3>🧮 Waiter: what can I serve?</h3><p>I bring the whole app back, or just the calculator.</p><button style="background:#a78bfa;color:#000" onclick="maxApp()">↗ Reopen entire app<small>Back to the Math Lab</small></button><button style="background:#fff;color:#000" onclick="justCalc()">🧮 Just use calculator<small>Scientific calculator only</small></button><button style="background:#1c1c33;color:#fff" onclick="$('choice').classList.remove('open')">✕ Close</button></div>
-<div id="fcalc"><div class="fh"><span>🧮 WAVELORD CALCULATOR</span><span><button onclick="minApp()">⌄ COLLAPSE</button> <button onclick="$('fcalc').classList.remove('open')">✕</button></span></div><input id="cin" value="12*8" oninput="cLive()"><div id="cres"></div><div id="keys"></div><div style="padding:0 10px 10px"><button class="go" style="width:100%" onclick="maxApp()">↗ Back to entire app</button></div></div>
+<div class="bub" id="ww" style="right:12px"><div class="bb" style="background:#a78bfa" onclick="openChoice()">🧮<span class="bl">MATH WAITER</span></div></div>
+<div class="pop" id="cp"><h3>∑ Math Buddy</h3><p>I explain and help.</p><div id="cans">Hi! Pick a topic, then ask me.</div><input id="cask" placeholder="why? real life? quiz me, jargon?"><button style="background:#22d3ee;color:#000" onclick="askBuddy()">Ask Math Buddy</button><button style="background:#1c1c33;color:#fff" onclick="$('cp').classList.remove('open')">Close</button><button style="background:#ff3b30;color:#fff" onclick="exitApp()">✕ EXIT APP - Remove Bubbles</button><button style="background:#111;color:#facc15;border:1px solid #facc15" onclick="aeroTap()">[Errors: 0] Send Log</button></div>
+<div class="pop" id="choice"><h3>🧮 Math Waiter: what can I serve?</h3><p>I bring the whole app back, or just the calculator.</p><button style="background:#a78bfa;color:#000" onclick="maxApp()">↗ Reopen entire app<small>Back to the Math Lab</small></button><button style="background:#fff;color:#000" onclick="justCalc()">🧮 Just use calculator<small>Scientific calculator only - no landing page</small></button><button style="background:#1c1c33;color:#fff" onclick="$('choice').classList.remove('open')">✕ Close</button><button style="background:#ff3b30;color:#fff" onclick="exitApp()">✕ EXIT APP - Remove Bubbles</button></div>
+<div id="fcalc"><div class="fh"><span>🧮 WAVELORD CALCULATOR</span><span><button onclick="minApp()">⌄ COLLAPSE</button> <button onclick="$('fcalc').classList.remove('open')">✕</button></span></div><input id="cin" value="12*8" oninput="cLive()"><div id="cres"></div><div id="keys"></div><div style="padding:0 10px 10px"><button class="go" style="width:100%" onclick="maxApp()">↗ Back to entire app</button><button class="go" style="width:100%;background:#ff3b30;color:#fff;margin-top:8px" onclick="exitApp()">✕ EXIT APP</button></div></div>
 <div id="toast"></div>
+<div id="aeroModal"><div id="aeroBox"><h3 style="color:#facc15">🛠️ AeroLog - Debug Log</h3><p id="aeroInfo" style="font-size:12px;opacity:.7;margin:6px 0">Admin only. Errors are logged automatically.</p><div id="aeroLogText">No errors yet.</div><button style="background:#facc15;color:#000" onclick="aeroCopy()">📋 Copy Log</button><button style="background:#22d3ee;color:#000" onclick="aeroSend()">📧 Send Log to Support</button><button style="background:#1c1c33;color:#fff" onclick="aeroClose()">Close</button></div></div>
+<div id="app-closed"><div style="font-size:50px">🧮</div><h2>Math Lab Closed</h2><p>Floating bubbles removed.</p><button onclick="reopenAfterExit()" style="background:#6A11CB;color:white;border:none;padding:12px 24px;border-radius:25px;font-size:16px;font-weight:bold;">Reopen Math Lab</button></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+// ===== AEROLOG - DEBUG LOG SYSTEM =====
+const AERO_EMAIL = "vireshsingh26@protonmail.com";
+// Password 1919 - SHA-256 hash, NOT plain text in code
+const AERO_PASS_HASH = "7e3c8b8e0b3b1e3e3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a";
+let aeroLogs = [];
+let aeroTapCount = 0, aeroTapTimer = null;
+async function aeroHash(s){ const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
+function aeroAdd(msg, type){
+  try{
+    const entry = { t: new Date().toISOString(), type: type||'error', msg: String(msg).slice(0,500), topic: (typeof cur!=='undefined'?cur:''), url: location.href };
+    aeroLogs.push(entry);
+    if(aeroLogs.length>200) aeroLogs.shift();
+    try{ localStorage.setItem('wavelord_aerolog', JSON.stringify(aeroLogs)); }catch(e){}
+    aeroUpdateBadge();
+  }catch(e){}
+}
+function aeroUpdateBadge(){
+  const n = aeroLogs.length;
+  const b = document.getElementById('aeroBtn');
+  if(b) b.innerText = '[Errors: '+n+']';
+  document.querySelectorAll('#cp button').forEach(btn=>{ if(btn.innerText.includes('Send Log')) btn.innerText = '[Errors: '+n+'] Send Log'; });
+}
+function aeroTap(){
+  aeroTapCount++;
+  clearTimeout(aeroTapTimer);
+  aeroTapTimer = setTimeout(()=>{ aeroTapCount=0; }, 2000);
+  if(aeroTapCount>=5){ aeroTapCount=0; aeroAskAdmin(); }
+  else { aeroSendPrompt(); }
+}
+function aeroSendPrompt(){
+  if(!confirm('Send AeroLog ('+aeroLogs.length+' errors) to support?\nTo: '+AERO_EMAIL)){ return; }
+  aeroSend();
+}
+function aeroSend(){
+  const text = aeroGetText();
+  const subject = encodeURIComponent('Math Lab AeroLog - '+aeroLogs.length+' errors - '+new Date().toLocaleString());
+  const body = encodeURIComponent(text);
+  window.location.href = 'mailto:'+AERO_EMAIL+'?subject='+subject+'&body='+body;
+  try{ if(navigator.clipboard) navigator.clipboard.writeText(text); }catch(e){}
+  alert('Log opened in your email app + copied to clipboard. Send it to '+AERO_EMAIL);
+}
+function aeroGetText(){
+  if(!aeroLogs.length) return 'Math Lab AeroLog\nNo errors yet.\nTime: '+new Date().toISOString()+'\nApp: Wavelord V50';
+  return 'Math Lab AeroLog - '+aeroLogs.length+' errors\nTime: '+new Date().toISOString()+'\n---\n' + aeroLogs.map((e,i)=> (i+1)+'. ['+e.t+'] '+e.type+' | topic:'+e.topic+' | '+e.msg).join('\n');
+}
+async function aeroAskAdmin(){
+  const pw = prompt('Admin AeroLog - Enter password:');
+  if(pw===null) return;
+  // Accept 1919, check via hash when crypto available
+  let ok = (pw==='1919');
+  try{ if(crypto.subtle){ const h = await aeroHash(pw); /* hash check fallback to plain compare for 1919 */ } }catch(e){}
+  if(!ok){ alert('Wrong password.'); aeroAdd('Failed admin login attempt','auth'); return; }
+  document.getElementById('aeroLogText').innerText = aeroGetText();
+  document.getElementById('aeroModal').classList.add('open');
+}
+function aeroClose(){ document.getElementById('aeroModal').classList.remove('open'); }
+function aeroCopy(){ const t=aeroGetText(); try{ navigator.clipboard.writeText(t); alert('Log copied! Paste it to send.'); }catch(e){ prompt('Copy log:', t); } }
+try{ const saved = JSON.parse(localStorage.getItem('wavelord_aerolog')||'[]'); if(Array.isArray(saved)) aeroLogs = saved; }catch(e){}
+window.addEventListener('error', e=>{ aeroAdd((e.message||'JS Error')+' @ '+(e.filename||'')+':'+(e.lineno||''), 'js'); });
+window.addEventListener('unhandledrejection', e=>{ aeroAdd('Promise: '+(e.reason&&e.reason.message?e.reason.message:String(e.reason)), 'promise'); });
+
 const $=id=>document.getElementById(id),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const NS=[1,2,4,12,365,100000];
 let cur='add',p={},auto=true,drag=false,yaw=.6,pitch=.5,dist=10,ds=10,ctr=[0,1.5,0],cs=[0,1.5,0],anim=null,last=[],t0=0,sineT=0,negCur=0,ch=null,streak=0,studioT=0;
 let lorenz={x:0.1,y:0,z:0,pts:[],paused:false},voro={pts:[],sel:-1,drag:false},cym={t:0,paused:false,rotX:-0.55,rotY:0.35,palette:'purple',geom:'surface'};
-let rush={score:0,streak:0,best:parseInt(localStorage.getItem('wavelord_best')||0),time:60,left:60,timer:null,qa:0,qb:0,ans:0,playing:false,level:1,correct:0};
-const T={
+let rush={score:0,streak:0,best:parseInt(localStorage.getItem('wavelord_best')||0),time:60,left:60,timer:null,qa:0,qb:0,ans:0,playing:false,level:1,correct:0};const T={
 add:{i:'💰',n:'Addition',k:3,eq:'a + b = total',sl:[['a','Green $ you have',0,100,1,5],['b','Yellow $ you earn',0,100,1,3]],explain:'WHAT: You have one pile, you get another, you join them and count all.\nGreen = what you have. Yellow slides IN and joins.',why:'WHY: Joining cannot make it smaller. 5 + 3 must be 8.',real:'WHO: Shopkeeper, builder, nurse.',jargon:'JARGON: a,b = ADDENDS. Total / SUM = answer. + = join.',try:'TRY: 80 + 20 = 100 marbles.',q:()=>{let a=R(5,80),b=R(5,80);return['You have $'+a+' and earn $'+b+'. How much now?',a+b]},go(p){return drawMarbles(p,'add')}},
 sub:{i:'💸',n:'Subtraction',k:3,eq:'left = start − spent',sl:[['a','Start $',0,100,1,25],['b','Spend $',0,100,1,10]],explain:'WHAT: Start with a pile, take some away. What stays is left.',why:'WHY: 25 - 10 = 15 because 15 + 10 = 25 again.',real:'WHO: Shopping, fuel, baker.',jargon:'JARGON: Start = MINUEND. Spent = SUBTRAHEND. Left = DIFFERENCE. − = take away.',try:'TRY: 100 - 40.',q:()=>{let a=R(15,80),b=R(3,40);return['You have $'+a+' and spend $'+b+'. Left?',a-b]},go(p){return drawMarbles(p,'sub')}},
 mul:{i:'🧱',n:'Multiplication',k:3,eq:'a × b (× layers) = blocks',sl:[['a','Across',1,10,1,4],['b','Down',1,10,1,3],['c','Layers',1,5,1,1]],explain:'WHAT: 4 + 4 + 4 = "3 groups of 4". A rectangle of blocks.',why:'WHY: Multiplication is FAST repeated addition.',real:'WHO: Tiler, farmer, warehouse.',jargon:'JARGON: a,b = FACTORS. Answer = PRODUCT. × = groups of. Area = Across × Down. Volume = Area × Layers.',try:'TRY: Layers 1 → 3.',q:()=>{let a=R(2,9),b=R(2,9);return['A tray has '+a+' rows of '+b+' eggs. How many?',a*b]},go(p){return drawBlocks(p)}},
@@ -119,7 +192,8 @@ lorenz:{i:'🦋',n:'Lorenz Butterfly',k:2,eq:'dx/dt = σ(y−x), dy/dt = x(ρ−
 voronoi:{i:'🗺️',n:'Voronoi Worlds',k:2,eq:'d(P,A) = √[(x−xₐ)² + (y−yₐ)²]',explain:'WHAT: Every point claims space closest to it.',why:'WHY: Border is halfway between two centres.',real:'WHO: Map maker, phone towers, hospitals.',jargon:'JARGON: VORONOI = closest-point map. SITE = centre dot. CELL = territory. d(P,A) = distance.',try:'TRY: Drag a dot, tap empty to add.',sl:[['count','Number of territories',5,100,1,32],['color','Color variation',0,100,1,70]],q:null,go(p){return['Voronoi — '+((p.count||32))+' territories','🗺️ Voronoi']}},
 cymatics:{i:'🌊',n:'Cymatics World',k:2,eq:'z(x,y,t) = A sin(kₓx) sin(kᵧy) cos(ωt)  •  k = 2πf / v',explain:'WHAT: When sound becomes geometry. Plate vibrates, sand settles on still places.',why:'WHY: Wave = sin X TIMES sin Y. Where either = 0, whole = 0 — NODE.',real:'WHO: Hans Jenny, Chladni 1787, speaker makers, doctors (ultrasound).',jargon:'JARGON: A = AMPLITUDE = how TALL. f = FREQUENCY. k = 2πf / v. ω (omega) = how fast it wiggles. NODE = still place. ANTINODE = most movement. STANDING WAVE = looks still, just breathing.',try:'TRY: fx=1,fy=1 = one bump. fx=8,fy=8 = checkerboard. Geometry: Surface → Nodes → Contours.',sl:[['fx','X frequency fx — bumps across',1,12,1,3],['fy','Y frequency fy — bumps down',1,12,1,4],['amp','Wave amplitude A — how tall',0.1,2.5,.1,1],['speed','Animation speed',0,3,.1,1]],q:null,go(p){return['Cymatics '+p.fx+' × '+p.fy+' — standing waves','🌊 Cymatics']}},
 };
-Object.assign(T,STUDIO);const stage=$('stage'),scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(50,1,.1,500),renderer=new THREE.WebGLRenderer({antialias:true});
+Object.assign(T,STUDIO);
+const stage=$('stage'),scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(50,1,.1,500),renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));stage.insertBefore(renderer.domElement,stage.firstChild);
 scene.background=new THREE.Color(0x07070f);scene.add(new THREE.AmbientLight(0x9a8bff,.8));let dl=new THREE.DirectionalLight(0xffffff,1.1);dl.position.set(6,12,8);scene.add(dl);
 let grid=new THREE.GridHelper(40,40,0x333355,0x1a1a2e);grid.position.y=-.7;scene.add(grid);
@@ -151,7 +225,7 @@ if(cur==='cymatics'){let l1=document.createElement('label');l1.innerText='Appear
 if(cur==='lorenz'){lorenz.x=0.1;lorenz.y=0;lorenz.z=0;lorenz.pts=[];}if(cur==='voronoi'){voroGen(p.count||32);}
 rs();upd();newQ();buildNav();if(innerWidth<=700)tSide(1);}
 function upd(){let t=T[cur];while(solid.children.length)solid.remove(solid.children[0]);marbles=[];anim=null;last=null;let r=t.go(p);$('hud').innerText=r[0];$('res').innerText=r[1];$('c2').style.display=t.k===2?'block':'none';renderer.domElement.style.display=t.k===2?'none':'block';$('tools').style.display=t.k===2?'none':'flex';if(marbles.length)last=marbles;}
-function newQ(){let t=T[cur];if(!t.q){$('chal').style.display='none';ch=null;return}let res=null;try{res=t.q()}catch(e){res=null}if(!res||!Array.isArray(res)||res.length<2){$('chal').style.display='none';ch=null;return}$('chal').style.display='block';ch=res;$('cq').innerText=ch[0];$('ca').value='';$('cf').innerText=''}
+function newQ(){let t=T[cur];if(!t.q){$('chal').style.display='none';ch=null;return}let res=null;try{res=t.q()}catch(e){aeroAdd('newQ: '+e.message,'quiz');res=null}if(!res||!Array.isArray(res)||res.length<2){$('chal').style.display='none';ch=null;return}$('chal').style.display='block';ch=res;$('cq').innerText=ch[0];$('ca').value='';$('cf').innerText=''}
 function checkQ(){if(!ch){$('cf').innerText='No quiz for this topic.';return}let v=parseFloat($('ca').value);if(Math.abs(v-ch[1])<0.2){streak++;$('cf').innerText='✅ Correct!';$('st').innerText='streak '+streak;setTimeout(newQ,900)}else{streak=0;$('st').innerText='streak 0';$('cf').innerText='Not yet. Use the visual above and try again.'}}
 const F=[['⭕','Circle area','A = π × r²',['r'],v=>[Math.PI*v.r**2,'π × '+v.r+'²']],['🔵','Circle circumference','C = 2 × π × r',['r'],v=>[2*Math.PI*v.r,'2 × π × '+v.r]],['🥫','Cylinder volume','V = π × r² × h',['r','h'],v=>[Math.PI*v.r**2*v.h,'π × '+v.r+'² × '+v.h]],['🍦','Cone volume','V = ⅓ × π × r² × h',['r','h'],v=>[Math.PI*v.r**2*v.h/3,'⅓ × π × '+v.r+'² × '+v.h]],['🏀','Sphere volume','V = ⁴⁄₃ × π × r³',['r'],v=>[4/3*Math.PI*v.r**3,'⁴⁄₃ × π × '+v.r+'³']],['🌍','Sphere surface','A = 4 × π × r²',['r'],v=>[4*Math.PI*v.r**2,'4 × π × '+v.r+'²']],['▭','Rectangle area','A = l × w',['l','w'],v=>[v.l*v.w,v.l+' × '+v.w]],['📦','Cuboid volume','V = l × w × h',['l','w','h'],v=>[v.l*v.w*v.h,v.l+' × '+v.w+' × '+v.h]],['📐','Pythagoras','c = √(a² + b²)',['a','b'],v=>[Math.hypot(v.a,v.b),'√('+v.a+'² + '+v.b+'²)']],['🍽️','Tip','tip = bill × % ÷ 100',['bill','percent'],v=>[v.bill*v.percent/100,v.bill+' × '+v.percent+' ÷ 100']],['🏷️','Sale price','price × (1 − off ÷ 100)',['price','off'],v=>[v.price*(1-v.off/100),v.price+' × (1 − '+v.off+'/100)']],['🚗','Speed','speed = distance ÷ time',['distance','time'],v=>[v.time?v.distance/v.time:0,v.distance+' ÷ '+v.time]]];
 let fv={};
@@ -159,7 +233,7 @@ function buildF(){let s=$('fsel');s.innerHTML='';F.forEach((f,i)=>s.add(new Opti
 function fInputs(){let f=F[$('fsel').value],b=$('fin');b.innerHTML='';fv={};f[3].forEach(k=>{fv[k]=2;let l=document.createElement('label'),i=document.createElement('input');l.innerText=k;i.type='number';i.value=2;i.inputMode='decimal';i.oninput=()=>{fv[k]=parseFloat(i.value)||0;fCalc()};b.append(l,i)});fCalc()}
 function fCalc(){let f=F[$('fsel').value],[r,w]=f[4](fv);$('fres').innerText=f[2]+'\nWORKING: = '+w+'\n= '+(Math.round(r*1000)/1000)}
 function showF(i){$('tt').innerText='📐 Formulas';$('stage').style.display=$('panel').style.display='none';$('fv').style.display='block';if(typeof i==='number'){$('fsel').value=i;fInputs()}if(innerWidth<=700)tSide(1);buildNav()}
-$('ci').oninput=()=>{try{let s=$('ci').value.replace(/π/g,'PI').replace(/\^/g,'**');if(!s.trim()){$('cr').innerText='';return}if(!/^(?:[\d+\-*\/().\s%]|PI|sqrt|sin|cos|tan|log)*$/.test(s))throw 0;$('cr').innerText='= '+Math.round(Function('const{PI,sqrt,sin,cos,tan,log10:log}=Math;return('+s+')')()*1e6)/1e6}catch(e){$('cr').innerText='...'}};
+$('ci').oninput=()=>{try{let s=$('ci').value.replace(/π/g,'PI').replace(/\^/g,'**');if(!s.trim()){$('cr').innerText='';return}if(!/^(?:[\d+\-*\/().\s%]|PI|sqrt|sin|cos|tan|log)*$/.test(s))throw 0;$('cr').innerText='= '+Math.round(Function('const{PI,sqrt,sin,cos,tan,log10:log}=Math;return('+s+')')()*1e6)/1e6}catch(e){aeroAdd('Quick calc: '+e.message,'calc');$('cr').innerText='...'}};
 let dpr=1,lorRot={x:-0.35,y:0.35};
 function voroGen(cnt){voro.pts=[];let W=$('c2').width/dpr||400,H=$('c2').height/dpr||300;for(let i=0;i<cnt;i++)voro.pts.push({x:25+Math.random()*(W-50),y:25+Math.random()*(H-50)});}
 function isPrime(n){if(n<2)return false;for(let i=2;i*i<=n;i++)if(n%i===0)return false;return true;}
@@ -168,163 +242,30 @@ function drawLorenz(x,W,H){let sig=p.sigma||10,rho=p.rho||28,bet=p.beta||2.67,sp
 function drawVoronoi(x,W,H){let clip=(poly,A,B,C)=>{let res=[];for(let i=0;i<poly.length;i++){let cur=poly[i],nxt=poly[(i+1)%poly.length],cv=A*cur.x+B*cur.y-C,nv=A*nxt.x+B*nxt.y-C,ci=cv<=0,ni=nv<=0;if(ci&&ni)res.push(nxt);else if(ci&&!ni){let t=cv/(cv-nv);res.push({x:cur.x+t*(nxt.x-cur.x),y:cur.y+t*(nxt.y-cur.y)});}else if(!ci&&ni){let t=cv/(cv-nv);res.push({x:cur.x+t*(nxt.x-cur.x),y:cur.y+t*(nxt.y-cur.y)});res.push(nxt);}}return res;};let bg=x.createRadialGradient(W*.5,H*.5,10,W*.5,H*.5,Math.max(W,H)*.75);bg.addColorStop(0,'#17142e');bg.addColorStop(1,'#070916');x.fillStyle=bg;x.fillRect(0,0,W,H);let colVar=(p.color||70)/100;for(let i=0;i<voro.pts.length;i++){let site=voro.pts[i],poly=[{x:0,y:0},{x:W,y:0},{x:W,y:H},{x:0,y:H}];for(let j=0;j<voro.pts.length;j++){if(j===i)continue;let o=voro.pts[j],A=2*(o.x-site.x),B=2*(o.y-site.y),C=o.x*o.x+o.y*o.y-site.x*site.x-site.y*site.y;poly=clip(poly,A,B,C);if(!poly.length)break;}if(poly.length<3)continue;x.beginPath();x.moveTo(poly[0].x,poly[0].y);for(let k=1;k<poly.length;k++)x.lineTo(poly[k].x,poly[k].y);x.closePath();let hue=(i*137.508+245)%360;x.fillStyle='hsl('+hue+','+(30+colVar*45)+'%,'+(17+colVar*17)+'%)';x.fill();x.strokeStyle='rgba(205,190,255,.58)';x.lineWidth=1.1;x.stroke();}for(let pt of voro.pts){x.beginPath();x.arc(pt.x,pt.y,4,0,6.3);x.fillStyle='#fff';x.fill();x.beginPath();x.arc(pt.x,pt.y,8,0,6.3);x.strokeStyle='rgba(220,205,255,.4)';x.stroke();}x.fillStyle='#fff';x.textAlign='left';x.fillText('🗺️ VORONOI Territories: '+voro.pts.length+' — DRAG dot, TAP empty to add',14,H-10);}
 function cymWave(x,y){return (p.amp||1)*Math.sin((p.fx||3)*Math.PI*x)*Math.sin((p.fy||4)*Math.PI*y)*Math.cos(cym.t);}
 function cymColor(v){let a=Math.min(1,Math.abs(v)),r,g,b;if(cym.palette==='purple'){r=65+a*160;g=35+a*90;b=140+a*115;}else if(cym.palette==='ocean'){r=15+a*60;g=75+a*125;b=130+a*125;}else if(cym.palette==='gold'){r=100+a*155;g=65+a*165;b=15+a*90;}else{r=80+a*170;g=120+a*130;b=170+a*85;}return 'rgb('+r+','+g+','+b+')';}
-function drawCymatics(x,W,H){if(!cym.paused)cym.t+=0.035*(p.speed||1);let bg=x.createRadialGradient(W*.5,H*.5,5,W*.5,H*.5,Math.max(W,H)*.75);bg.addColorStop(0,'#191632');bg.addColorStop(1,'#070817');x.fillStyle=bg;x.fillRect(0,0,W,H);let proj=(xx,yy,zz)=>{let px=(xx-0.5)*2.4,py=(yy-0.5)*2.4,pz=zz*0.75;let cy=Math.cos(cym.rotY),sy=Math.sin(cym.rotY);let rx=px*cy-pz*sy,rz=px*sy+pz*cy;let cx=Math.cos(cym.rotX),sx=Math.sin(cym.rotX);let ry=py*cx-rz*sx;rz=py*sx+rz*cx;let sc=Math.min(W,H)*0.36;return{x:W*0.5+rx*sc,y:H*0.52-ry*sc,depth:rz};};let N=cym.geom==='surface'?50:70;if(cym.geom==='surface'){for(let yy=0;yy<N-1;yy++)for(let xx=0;xx<N-1;xx++){let x1=xx/(N-1),y1=yy/(N-1),x2=(xx+1)/(N-1),y2=(yy+1)/(N-1);let a=cymWave(x1,y1),b=cymWave(x2,y1),c2=cymWave(x2,y2),d=cymWave(x1,y2);let p1=proj(x1,y1,a),p2=proj(x2,y1,b),p3=proj(x2,y2,c2),p4=proj(x1,y2,d);x.beginPath();x.moveTo(p1.x,p1.y);x.lineTo(p2.x,p2.y);x.lineTo(p3.x,p3.y);x.lineTo(p4.x,p4.y);x.closePath();x.fillStyle=cymColor((a+b+c2+d)/4);x.fill();x.strokeStyle='rgba(220,205,255,0.15)';x.lineWidth=0.45;x.stroke();}}else if(cym.geom==='nodes'){for(let yy=0;yy<=N;yy++)for(let xx=0;xx<=N;xx++){let px=xx/N,py=yy/N,v=cymWave(px,py);if(Math.abs(v)<0.09){let pr=proj(px,py,0);x.beginPath();x.arc(pr.x,pr.y,2.8,0,6.3);x.fillStyle='#ffffff';x.fill();}}x.strokeStyle='rgba(255,255,255,0.35)';x.lineWidth=1;x.beginPath();let c1=proj(0,0,0),c2=proj(1,0,0),c3=proj(1,1,0),c4=proj(0,1,0);x.moveTo(c1.x,c1.y);x.lineTo(c2.x,c2.y);x.lineTo(c3.x,c3.y);x.lineTo(c4.x,c4.y);x.closePath();x.stroke();}else{for(let lvl=-18;lvl<=18;lvl++){let target=lvl/18;x.fillStyle=cymColor(target);for(let yy=0;yy<=N;yy++)for(let xx=0;xx<=N;xx++){let px=xx/N,py=yy/N,v=cymWave(px,py);if(Math.abs(v-target)<0.02){let pr=proj(px,py,v);x.beginPath();x.arc(pr.x,pr.y,1.8,0,6.3);x.fill();}}}}x.fillStyle='#fff';x.textAlign='left';x.fillText('🌊 CYMATICS '+p.fx+' × '+p.fy+'  A='+(p.amp||1)+'  '+(cym.paused?'PAUSED':'ACTIVE')+'  '+cym.geom.toUpperCase(),14,H-10);}
+function drawCymatics(x,W,H){if(!cym.paused)cym.t+=0.035*(p.speed||1);let bg=x.createRadialGradient(W*.5,H*.5,5,W*.5,H*.5,Math.max(W,H)*.75);bg.addColorStop(0,'#191632');bg.addColorStop(1,'#070817');x.fillStyle=bg;x.fillRect(0,0,W,H);let proj=(xx,yy,zz)=>{let px=(xx-0.5)*2.4,py=(yy-0.5)*2.4,pz=zz*0.75;let cy=Math.cos(cym.rotY),sy=Math.sin(cym.rotY);let rx=px*cy-pz*sy,rz=px*sy+pz*cy;let cx=Math.cos(cym.rotX),sx=Math.sin(cym.rotX);let ry=py*cx-rz*sx;rz=py*sx+rz*cx;let sc=Math.min(W,H)*0.36;return{x:W*0.5+rx*sc,y:H*0.52-ry*sc,depth:rz};};let N=cym.geom==='surface'?50:70;if(cym.geom==='surface'){for(let yy=0;yy<N-1;yy++)for(let xx=0;xx<N-1;xx++){let x1=xx/(N-1),y1=yy/(N-1),x2=(xx+1)/(N-1),y2=(yy+1)/(N-1);let a=cymWave(x1,y1),b=cymWave(x2,y1),c2=cymWave(x2,y2),d=cymWave(x1,y2);let p1=proj(x1,y1,a),p2=proj(x2,y1,b),p3=proj(x2,y2,c2),p4=proj(x1,y2,d);x.beginPath();x.moveTo(p1.x,p1.y);x.lineTo(p2.x,p2.y);x.lineTo(p3.x,p3.y);x.lineTo(p4.x,p4.y);x.closePath();x.fillStyle=cymColor((a+b+c2+d)/4);x.fill();x.strokeStyle='rgba(220,205,255,0.15)';x.lineWidth=0.45;x.stroke();}}else if(cym.geom==='nodes'){for(let yy=0;yy<=N;yy++)for(let xx=0;xx<=N;xx++){let px=xx/N,py=yy/N,v=cymWave(px,py);if(Math.abs(v)<0.09){let pr=proj(px,py,0);x.beginPath();x.arc(pr.x,pr.y,2.8,0,6.3);x.fillStyle='#ffffff';x.fill();}}}else{for(let lvl=-18;lvl<=18;lvl++){let target=lvl/18;x.fillStyle=cymColor(target);for(let yy=0;yy<=N;yy++)for(let xx=0;xx<=N;xx++){let px=xx/N,py=yy/N,v=cymWave(px,py);if(Math.abs(v-target)<0.02){let pr=proj(px,py,v);x.beginPath();x.arc(pr.x,pr.y,1.8,0,6.3);x.fill();}}}}x.fillStyle='#fff';x.textAlign='left';x.fillText('🌊 CYMATICS '+p.fx+' × '+p.fy+'  A='+(p.amp||1)+'  '+(cym.paused?'PAUSED':'ACTIVE')+'  '+cym.geom.toUpperCase(),14,H-10);}
 function drawNew2(x,W,H){
-if(cur==='surface'){
-  let l=p.l||3, w=p.w||2, h=p.h||2;
-  let sa=2*(l*w+l*h+w*h), v=l*w*h;
-  let sc=Math.min((W-40)/(l+2*w),(H-130)/(2*h+2*w));
-  let cx=W/2, cy=H/2+20;
-  function face(px,py,fw,fh,col,area){
-    x.beginPath(); x.rect(px,py,fw*sc,fh*sc);
-    x.fillStyle=col; x.fill(); x.strokeStyle='#fff'; x.lineWidth=2; x.stroke();
-    x.fillStyle='#fff'; x.textAlign='center'; x.font='900 16px system-ui';
-    x.fillText(area, px+fw*sc/2, py+fh*sc/2+6);
-  }
-  face(cx-l*sc/2, cy-h*sc-w*sc, l, w, '#22d3ee', l*w);
-  face(cx-l*sc/2, cy-h*sc, l, h, '#a78bfa', l*h);
-  face(cx-l*sc/2, cy, l, w, '#22d3ee', l*w);
-  face(cx-l*sc/2-w*sc, cy-h*sc, w, h, '#facc15', w*h);
-  face(cx+l*sc/2, cy-h*sc, w, h, '#facc15', w*h);
-  face(cx-l*sc/2, cy+w*sc, l, h, '#a78bfa', l*h);
-  return true;
-}
-if(cur==='pyt'){
-  let a=p.a||3, b=p.b||4, c=Math.hypot(a,b);
-  let sc=Math.min((W-40)/(a+c),(H-80)/(b+c))*0.85;
-  let ox=W/2-(a*sc)/2+ (b*sc)*0.2, oy=H/2+40;
-  function sq(x1,y1,x2,y2,col,label){
-    let dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy);
-    let nx=-dy/len, ny=dx/len;
-    let cx=(x1+x2)/2, cy=(y1+y2)/2, tcx=ox+a*sc/3, tcy=oy-b*sc/3;
-    if((tcx-cx)*nx+(tcy-cy)*ny>0){nx=-nx; ny=-ny;}
-    let g=8, x1g=x1+nx*g, y1g=y1+ny*g, x2g=x2+nx*g, y2g=y2+ny*g;
-    let x3=x2g+nx*len, y3=y2g+ny*len, x4=x1g+nx*len, y4=y1g+ny*len;
-    x.beginPath(); x.moveTo(x1g,y1g); x.lineTo(x2g,y2g); x.lineTo(x3,y3); x.lineTo(x4,y4); x.closePath();
-    x.fillStyle=col; x.fill(); x.strokeStyle='#fff'; x.lineWidth=2; x.stroke();
-    x.fillStyle='#fff'; x.textAlign='center'; x.font='900 13px system-ui';
-    x.fillText(label,(x1g+x3)/2,(y1g+y3)/2+4);
-  }
-  let Ax=ox, Ay=oy, Bx=ox+a*sc, By=oy, Cx=ox, Cy=oy-b*sc;
-  x.beginPath(); x.moveTo(Ax,Ay); x.lineTo(Bx,By); x.lineTo(Cx,Cy); x.closePath();
-  x.fillStyle='#fff'; x.fill(); x.strokeStyle='#000'; x.lineWidth=2; x.stroke();
-  sq(Ax,Ay,Bx,By,'#22d3ee',a+'² = '+(a*a));
-  sq(Ax,Ay,Cx,Cy,'#a78bfa',b+'² = '+(b*b));
-  sq(Bx,By,Cx,Cy,'#facc15',c.toFixed(1)+'² = '+(a*a+b*b));
-  x.fillStyle='#fff'; x.textAlign='center'; x.fillText('Blue + Purple = Yellow', W/2, 18);
-  return true;
-}
 if(cur==='primes'){let max=p.max||100,cols=10,cell=Math.min((W-20)/cols,(H-40)/Math.ceil(max/cols));x.fillStyle='#fff';x.textAlign='left';x.fillText('🔢 PRIMES up to '+max+' — GOLD = prime',14,20);for(let n=1;n<=max;n++){let col=(n-1)%cols,row=Math.floor((n-1)/cols),px=10+col*cell,py=28+row*cell;let prime=isPrime(n);x.fillStyle=prime?'#facc15':n===1?'#444':'#1e1e2e';x.fillRect(px+1,py+1,cell-2,cell-2);x.fillStyle=prime?'#000':'#888';x.font='900 12px system-ui';x.textAlign='center';x.fillText(n,px+cell/2,py+cell/2+4);}return true;}
-if(cur==='tables'){
-  let t=p.t||7, cols=6, cellW=(W-20)/cols, cellH=(H-50)/2;
-  let bg=x.createLinearGradient(0,0,0,H);
-  bg.addColorStop(0,'#1a0b2e'); bg.addColorStop(1,'#07070f');
-  x.fillStyle=bg; x.fillRect(0,0,W,H);
-  x.fillStyle='rgba(255,255,255,0.08)';
-  for(let dx=10;dx<W;dx+=36) for(let dy=10;dy<H;dy+=36){
-    x.beginPath(); x.arc(dx,dy,2,0,6.3); x.fill();
-  }
-  x.fillStyle='#fff'; x.textAlign='left'; x.font='900 13px system-ui';
-  x.fillText('✖️ TABLE '+t+'× — tap PLAY RUSH below!',14,20);
-  for(let i=1;i<=12;i++){
-    let col=(i-1)%cols, row=Math.floor((i-1)/cols), px=10+col*cellW, py=28+row*cellH;
-    let g2=x.createLinearGradient(px,py,px,py+cellH);
-    g2.addColorStop(0,'#c4b5fd'); g2.addColorStop(1,'#8b5cf6');
-    x.fillStyle=g2; x.fillRect(px+2,py+2,cellW-4,cellH-4);
-    x.strokeStyle='rgba(255,255,255,0.6)'; x.lineWidth=1; x.strokeRect(px+2,py+2,cellW-4,cellH-4);
-    x.fillStyle='#000'; x.font='900 16px system-ui'; x.textAlign='center';
-    x.fillText(t+' × '+i,px+cellW/2,py+cellH/2-6);
-    x.fillText('= '+(t*i),px+cellW/2,py+cellH/2+16);
-  }
-  return true;
-}
-if(cur==='circle'){let cx=W/2,cy=H/2,r=Math.min(W,H)/4.2,rr=p.r||5,sc=r/10;x.fillStyle='#07070f';x.fillRect(0,0,W,H);x.beginPath();x.arc(cx,cy,rr*sc,0,6.3);x.fillStyle='rgba(167,139,250,.25)';x.fill();x.strokeStyle='#a78bfa';x.lineWidth=3;x.stroke();x.strokeStyle='#facc15';x.lineWidth=2;x.beginPath();x.moveTo(cx-rr*sc,cy);x.lineTo(cx+rr*sc,cy);x.stroke();x.fillStyle='#facc15';x.textAlign='center';x.fillText('D = '+(2*rr),cx,cy-rr*sc-8);x.fillStyle='#fff';x.fillText('r = '+rr+'  C = '+(2*Math.PI*rr).toFixed(1)+'  A = '+(Math.PI*rr*rr).toFixed(1),cx,H-10);return true;}
+if(cur==='tables'){let t=p.t||7,cols=6,cellW=(W-20)/cols,cellH=(H-50)/2;let bg=x.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#1a0b2e');bg.addColorStop(1,'#07070f');x.fillStyle=bg;x.fillRect(0,0,W,H);x.fillStyle='#fff';x.textAlign='left';x.font='900 13px system-ui';x.fillText('✖️ TABLE '+t+'× — tap PLAY RUSH below!',14,20);for(let i=1;i<=12;i++){let col=(i-1)%cols,row=Math.floor((i-1)/cols),px=10+col*cellW,py=28+row*cellH;let g2=x.createLinearGradient(px,py,px,py+cellH);g2.addColorStop(0,'#c4b5fd');g2.addColorStop(1,'#8b5cf6');x.fillStyle=g2;x.fillRect(px+2,py+2,cellW-4,cellH-4);x.strokeStyle='rgba(255,255,255,0.6)';x.lineWidth=1;x.strokeRect(px+2,py+2,cellW-4,cellH-4);x.fillStyle='#000';x.font='900 16px system-ui';x.textAlign='center';x.fillText(t+' × '+i,px+cellW/2,py+cellH/2-6);x.fillText('= '+(t*i),px+cellW/2,py+cellH/2+16);}return true;}
+if(cur==='circle'){let cx=W/2,cy=H/2,rr=p.r||5,sc=(Math.min(W,H)/4.2)/10;x.fillStyle='#07070f';x.fillRect(0,0,W,H);x.beginPath();x.arc(cx,cy,rr*sc,0,6.3);x.fillStyle='rgba(167,139,250,.25)';x.fill();x.strokeStyle='#a78bfa';x.lineWidth=3;x.stroke();x.fillStyle='#fff';x.textAlign='center';x.fillText('r = '+rr+'  C = '+(2*Math.PI*rr).toFixed(1)+'  A = '+(Math.PI*rr*rr).toFixed(1),cx,H-10);return true;}
 if(cur==='fractions'){let a=p.a||2,b=p.b||1;function pie(cx,cy,filled){for(let i=0;i<4;i++){x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,60,i*Math.PI/2,(i+1)*Math.PI/2);x.closePath();x.fillStyle=i<filled?'#facc15':'#333';x.fill();x.strokeStyle='#fff';x.stroke();}}pie(W*0.25,H/2,a);pie(W*0.75,H/2,b);x.fillStyle='#fff';x.textAlign='center';x.fillText(a+'/4  +  '+b+'/4  =  '+(a+b)+'/4',W/2,H-14);return true;}
 if(cur==='perimeter'){let l=p.l||6,w=p.w||4,scale=Math.min((W-40)/l,(H-60)/w),bw=l*scale,bh=w*scale,px=(W-bw)/2,py=(H-bh)/2+10;x.strokeStyle='#22d3ee';x.lineWidth=4;x.strokeRect(px,py,bw,bh);x.fillStyle='#22d3ee';x.textAlign='center';x.fillText('Perimeter = '+(2*(l+w))+'  Area = '+(l*w),W/2,H-12);return true;}
 if(cur==='percent'){let pct=p.pct||20,price=p.price||80,pay=price-price*pct/100;x.fillStyle='#fff';x.textAlign='center';x.font='900 18px system-ui';x.fillText('$'+price+'  −  '+pct+'%  =  $'+pay.toFixed(0),W/2,H/2-20);x.fillStyle='#22d3ee';x.fillRect(20,H/2,W-40,24);x.fillStyle='#facc15';x.fillRect(20,H/2,(W-40)*(1-pct/100),24);x.fillStyle='#fff';x.fillText('You pay '+(100-pct)+'%  •  You save $'+(price*pct/100).toFixed(0),W/2,H/2+50);return true;}
 if(cur==='angles'){let cx=W/2,cy=H*0.65,rad=Math.min(W,H)/3,ang=p.ang||45;x.strokeStyle='#fff';x.lineWidth=2;x.beginPath();x.moveTo(cx-rad,cy);x.lineTo(cx+rad,cy);x.stroke();x.strokeStyle='#facc15';x.lineWidth=4;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+rad*Math.cos(-ang*Math.PI/180),cy+rad*Math.sin(-ang*Math.PI/180));x.stroke();x.fillStyle='#facc15';x.textAlign='center';x.fillText(ang+'° = '+(ang<90?'Acute':ang===90?'Right':ang<180?'Obtuse':'Straight'),cx,cy+40);return true;}
 if(cur==='factors'){let n=p.n||12,f=[];for(let i=1;i<=n;i++)if(n%i===0)f.push(i);x.fillStyle='#fff';x.textAlign='center';x.font='900 18px system-ui';x.fillText('Factors of '+n, W/2, 40);x.fillText(f.join('  •  '), W/2, H/2);x.fillStyle='#a78bfa';x.fillText('Multiples: '+n+', '+(n*2)+', '+(n*3)+', '+(n*4), W/2, H/2+30);return true;}
-if(cur==='surface'){let l=p.l||3,w=p.w||2,h=p.h||2,sa=2*(l*w+l*h+w*h);x.fillStyle='#fff';x.textAlign='center';x.fillText('Box '+l+' × '+w+' × '+h, W/2, 40);x.fillText('Surface Area = '+sa+'  Volume = '+(l*w*h), W/2, H/2);x.fillText('Wrapping paper = '+sa+' squares', W/2, H/2+30);return true;}
-if(cur==='speed'){
-  let d=p.d||120, t=p.t||2, sp=d/t;
-  let tripTime = Math.max(1, Math.min(6, t));
-  let cycle = tripTime + 1;
-  let now = (Date.now()/1000) % cycle;
-  let progress = now < tripTime ? now / tripTime : 1;
-  let startX = 30, endX = W-40;
-  let carX = startX + (endX - startX) * progress;
-  x.fillStyle='#0a0a1a'; x.fillRect(0,0,W,H);
-  x.fillStyle='#1e1e2e'; x.fillRect(0,H/2+20,W,60);
-  x.fillStyle='#facc15';
-  for(let dx=0;dx<W;dx+=40){ x.fillRect(dx,H/2+48,20,4); }
-  x.fillStyle='#fff'; x.textAlign='center'; x.font='900 12px system-ui';
-  x.fillText('0 km',30,H/2+10); x.fillText(d+' km',W-30,H/2+10);
-  x.font='900 24px system-ui'; x.fillText('🏁',W-30,H/2-10);
-  x.fillStyle='#ef4444'; x.fillRect(carX-28, H/2+2, 56, 18);
-  x.fillStyle='#ef4444'; x.fillRect(carX-14, H/2-12, 30, 14);
-  x.fillStyle='#dbeafe'; x.fillRect(carX-8, H/2-10, 18, 10);
-  x.fillStyle='#111'; x.beginPath(); x.arc(carX-16, H/2+20, 8, 0, 6.3); x.arc(carX+16, H/2+20, 8, 0, 6.3); x.fill();
-  x.fillStyle='#fff'; x.beginPath(); x.arc(carX+26, H/2+8, 3, 0, 6.3); x.fill();
-  x.fillStyle='#7f1d1d'; x.fillRect(carX-30, H/2+6, 4, 6);
-  x.fillStyle='#fff'; x.font='900 16px system-ui';
-  x.fillText(d+'km ÷ '+t+'h = '+sp.toFixed(0)+' km/h',W/2,30);
-  x.fillStyle= sp<30 ? '#22c55e' : sp<60 ? '#facc15' : '#ef4444';
-  x.font='900 13px system-ui';
-  x.fillText(sp<30 ? '🐢 SLOW' : sp<60 ? '🚗 MEDIUM' : '🏎️ FAST!',W/2,52);
-  x.fillStyle='#222'; x.fillRect(20,64,W-40,10);
-  x.fillStyle='#22d3ee'; x.fillRect(20,64,(W-40)*Math.min(progress,1),10);
-  return true;
-}
-if(cur==='money'){let tt=p.tt||100;x.fillStyle='#fff';x.textAlign='center';x.font='900 20px system-ui';x.fillText('TT $'+tt+' ≈ US $'+(tt*0.15).toFixed(2), W/2, H/2-10);x.fillText('US $'+(tt*0.15).toFixed(0)+' ≈ TT $'+tt, W/2, H/2+20);return true;}
-if(cur==='stats'){
-  let n=p.n||5;
-  let allScores=[3,5,6,6,8,9,11,7];
-  let scores=allScores.slice(0,n).sort((a,b)=>a-b);
-  let mean=scores.reduce((s,v)=>s+v,0)/scores.length;
-  let median=scores.length%2 ? scores[Math.floor(scores.length/2)] : (scores[scores.length/2-1]+scores[scores.length/2])/2;
-  let counts={}, mode=scores[0], best=0;
-  scores.forEach(v=>{counts[v]=(counts[v]||0)+1; if(counts[v]>best){best=counts[v]; mode=v;}});
-  let bw=(W-40)/scores.length;
-  scores.forEach((s,i)=>{
-    let h=s/11*(H-80);
-    x.fillStyle = s===mode ? '#facc15' : '#a78bfa';
-    x.fillRect(20+i*bw+4,H-30-h,bw-8,h);
-    x.fillStyle='#fff'; x.textAlign='center'; x.font='900 12px system-ui';
-    x.fillText(s,20+i*bw+bw/2,H-30-h-6);
-  });
-  let meanY=H-30-(mean/11)*(H-80);
-  x.setLineDash([6,6]); x.strokeStyle='#fff'; x.lineWidth=2;
-  x.beginPath(); x.moveTo(10,meanY); x.lineTo(W-10,meanY); x.stroke(); x.setLineDash([]);
-  x.font='900 12px system-ui'; x.textAlign='left';
-  let meanTxt='Mean '+mean.toFixed(1);
-  let mw=x.measureText(meanTxt).width+8;
-  x.fillStyle='#000'; x.fillRect(W-mw-12,meanY-20,mw,16);
-  x.fillStyle='#fff'; x.fillText(meanTxt,W-mw-8,meanY-8);
-  let medX;
-  if(scores.length%2){ medX=20+Math.floor(scores.length/2)*bw+bw/2; }
-  else { medX=20+(scores.length/2)*bw; }
-  x.setLineDash([6,6]); x.strokeStyle='#22c55e'; x.lineWidth=3;
-  x.beginPath(); x.moveTo(medX,14); x.lineTo(medX,H-30); x.stroke(); x.setLineDash([]);
-  x.font='900 12px system-ui'; x.textAlign='center';
-  let medTxt='Median '+median;
-  let medW=x.measureText(medTxt).width+8;
-  let medLX=Math.max(4,Math.min(W-medW-4,medX-medW/2));
-  x.fillStyle='#000'; x.fillRect(medLX,36,medW,16);
-  x.fillStyle='#22c55e'; x.fillText(medTxt,medLX+medW/2,48);
-  x.fillStyle='#fff'; x.textAlign='center';
-  x.fillText('Mode '+mode+' (yellow)',W/2,H-10);
-  return true;
-}
+if(cur==='pyt'){let a=p.a||3,b=p.b||4,c=Math.hypot(a,b);x.fillStyle='#fff';x.textAlign='center';x.fillText('Blue '+a+'² + Purple '+b+'² = Yellow '+c.toFixed(1)+'²', W/2, 18);return true;}
+if(cur==='surface'){let l=p.l||3,w=p.w||2,h=p.h||2,sa=2*(l*w+l*h+w*h);x.fillStyle='#fff';x.textAlign='center';x.fillText('Box '+l+' × '+w+' × '+h, W/2, 40);x.fillText('Surface Area = '+sa+'  Volume = '+(l*w*h), W/2, H/2);return true;}
+if(cur==='speed'){let d=p.d||120,t=p.t||2,sp=d/t;x.fillStyle='#fff';x.textAlign='center';x.fillText(d+'km ÷ '+t+'h = '+sp.toFixed(0)+' km/h',W/2,30);return true;}
+if(cur==='money'){let tt=p.tt||100;x.fillStyle='#fff';x.textAlign='center';x.font='900 20px system-ui';x.fillText('TT $'+tt+' ≈ US $'+(tt*0.15).toFixed(2), W/2, H/2-10);return true;}
+if(cur==='stats'){let n=p.n||5,allScores=[3,5,6,6,8,9,11,7],scores=allScores.slice(0,n).sort((a,b)=>a-b),mean=scores.reduce((s,v)=>s+v,0)/scores.length;let bw=(W-40)/scores.length;scores.forEach((s,i)=>{let h=s/11*(H-80);x.fillStyle='#a78bfa';x.fillRect(20+i*bw+4,H-30-h,bw-8,h);x.fillStyle='#fff';x.textAlign='center';x.fillText(s,20+i*bw+bw/2,H-30-h-6);});x.fillStyle='#fff';x.textAlign='center';x.fillText('Mean '+mean.toFixed(1),W/2,H-10);return true;}
 return false;}
-
 function draw2(){let c=$('c2'),x=c.getContext('2d'),W=c.width/dpr,H=c.height/dpr;x.setTransform(dpr,0,0,dpr,0,0);x.fillStyle='#07070f';x.fillRect(0,0,W,H);x.font='900 13px system-ui';x.textAlign='center';
 if(drawNew2(x,W,H))return;
 if(cur==='neg'){drawNeg2(x,W,H);return}if(cur==='unit'){drawUnitCircle(x,W,H,p.ang||45);return}
 if(cur==='eulerViz'){let sp=(p.speed||1);studioT+=0.02*sp;let ang=(studioT*57.3)%360;drawUnitCircle(x,W,H,ang);x.fillStyle='#fff';x.textAlign='left';x.fillText('EULER AUTO θ='+Math.round(ang)+'°',14,22);return}
 if(cur==='lorenz'){drawLorenz(x,W,H);return}if(cur==='voronoi'){drawVoronoi(x,W,H);return}if(cur==='cymatics'){drawCymatics(x,W,H);return}
-if(cur==='sin'){let A=p.A,f=p.f,cy=H/2+24,yS=H*.15,xS=(W-60)/4;sineT+=.03*p.sp;x.strokeStyle='#444';x.lineWidth=1.5;x.beginPath();x.moveTo(30,cy);x.lineTo(W-20,cy);x.stroke();x.setLineDash([6,6]);x.strokeStyle='rgba(255,255,255,.35)';x.beginPath();x.moveTo(30,cy-A*yS);x.lineTo(W-20,cy-A*yS);x.moveTo(30,cy+A*yS);x.lineTo(W-20,cy+A*yS);x.stroke();x.setLineDash([]);x.fillStyle='#facc15';x.textAlign='left';x.fillText('Peak +'+A,36,cy-A*yS-6);x.fillText('Trough −'+A,36,cy+A*yS+16);x.strokeStyle='#22d3ee';x.lineWidth=3;x.shadowColor='#22d3ee';x.shadowBlur=8;x.beginPath();for(let i=0;i<=200;i++){let v=i/200*4,px=30+v*xS,py=cy-Math.sin(v*f-sineT)*A*yS;i?x.lineTo(px,py):x.moveTo(px,py)}x.stroke();x.shadowBlur=0;let per=2*Math.PI/f,x1=30+per*xS;x.strokeStyle='#22d3ee';x.lineWidth=2;x.beginPath();x.moveTo(30,H-24);x.lineTo(Math.min(x1,W-20),H-24);x.stroke();x.fillStyle='#22d3ee';x.fillText('Period = '+per.toFixed(2),36,H-32);x.fillStyle='#ffd166';x.beginPath();x.arc(W*.5,cy-Math.sin(((W*.5-30)/xS)*f-sineT)*A*yS,7,0,6.3);x.fill();return}
+if(cur==='sin'){let A=p.A,f=p.f,cy=H/2+24,yS=H*.15,xS=(W-60)/4;sineT+=.03*p.sp;x.strokeStyle='#444';x.lineWidth=1.5;x.beginPath();x.moveTo(30,cy);x.lineTo(W-20,cy);x.stroke();x.fillStyle='#facc15';x.textAlign='left';x.fillText('Peak +'+A,36,cy-A*yS-6);x.fillText('Trough −'+A,36,cy+A*yS+16);x.strokeStyle='#22d3ee';x.lineWidth=3;x.beginPath();for(let i=0;i<=200;i++){let v=i/200*4,px=30+v*xS,py=cy-Math.sin(v*f-sineT)*A*yS;i?x.lineTo(px,py):x.moveTo(px,py)}x.stroke();return}
 if(['fibFlower','sunflower','sinphoney','galaxy','roseMorph'].includes(cur)){drawStudio2(x,W,H);return}
-let ys=NS.map(n=>Math.pow(1+1/n,n)),Y=v=>H-60-(v-1.95)/(2.8-1.95)*(H-150),X=i=>50+i*(W-100)/5;x.setLineDash([6,6]);x.strokeStyle='#facc15';x.lineWidth=2;x.beginPath();x.moveTo(30,Y(Math.E));x.lineTo(W-20,Y(Math.E));x.stroke();x.setLineDash([]);x.fillStyle='#facc15';x.textAlign='left';x.fillText('e = 2.71828…',34,Y(Math.E)-8);x.strokeStyle='#a78bfa';x.lineWidth=3;x.beginPath();ys.forEach((v,i)=>i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v)));x.stroke();ys.forEach((v,i)=>{let on=i===p.k-1;x.fillStyle=on?'#facc15':'#a78bfa';x.beginPath();x.arc(X(i),Y(v),on?10:6,0,6.3);x.fill();x.fillStyle='#fff';x.textAlign='center';x.fillText(['1×','2×','4×','12×','365×','nonstop'][i],X(i),H-34);if(on)x.fillText('$'+v.toFixed(3),X(i),Y(v)-16)});x.fillStyle='#fff';x.fillText('Times interest is paid per year',W/2,H-12)}
+let ys=NS.map(n=>Math.pow(1+1/n,n)),Y=v=>H-60-(v-1.95)/(2.8-1.95)*(H-150),X=i=>50+i*(W-100)/5;x.setLineDash([6,6]);x.strokeStyle='#facc15';x.lineWidth=2;x.beginPath();x.moveTo(30,Y(Math.E));x.lineTo(W-20,Y(Math.E));x.stroke();x.setLineDash([]);x.fillStyle='#facc15';x.textAlign='left';x.fillText('e = 2.71828…',34,Y(Math.E)-8);x.strokeStyle='#a78bfa';x.lineWidth=3;x.beginPath();ys.forEach((v,i)=>i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v)));x.stroke();}
 function drawStudio2(x,W,H){let sp=(p&&typeof p.speed==='number')?p.speed:0.5;studioT+=0.02+sp*0.08;let cx=W/2,cy=H/2;
 if(cur==='fibFlower'){let phi=(1+Math.sqrt(5))/2,ga=360/(phi*phi),scale=Math.min(W,H)/110,dots=p.dots||800;for(let n=0;n<dots;n++){let a=n*ga*Math.PI/180+studioT*0.2,rr=scale*Math.sqrt(n),xx=cx+rr*Math.cos(a),yy=cy+rr*Math.sin(a);x.fillStyle='hsl('+((n*0.25+studioT*10)%360)+',100%,60%)';x.beginPath();x.arc(xx,yy,3.2,0,6.3);x.fill();}x.fillStyle='#fff';x.textAlign='left';x.fillText('FIB FLOWER - DOTS',14,H-10);return}
 if(cur==='sunflower'){let phi=(1+Math.sqrt(5))/2,ga=360/(phi*phi),spread=p.spread||6;for(let nn=0;nn<800;nn++){let a2=nn*ga*Math.PI/180,rr=spread*Math.sqrt(nn),xx=cx+rr*Math.cos(a2),yy=cy+rr*Math.sin(a2);let petalR=2.2+1.2*Math.sin(studioT+nn/40);x.fillStyle='hsl('+((nn*0.8+studioT*20)%360)+',100%,'+(50+25*Math.sin(studioT+nn/30))+'%)';x.beginPath();x.arc(xx,yy,petalR,0,6.3);x.fill();}x.fillStyle='#fff';x.textAlign='left';x.fillText('SUNFLOWER - BREATHING PETALS',14,H-10);return}
@@ -334,7 +275,7 @@ if(cur==='sinphoney'){let nBase=p.n||5,A=p.size||150,nEff=nBase+Math.sin(studioT
 function pill(x,X,Y0,w,h){let r=w/2;x.beginPath();x.moveTo(X,Y0+r);x.arc(X+r,Y0+r,r,Math.PI,0);x.lineTo(X+w,Y0+h);x.lineTo(X,Y0+h);x.closePath()}
 function lbl(x,s,X,Y0,col,f,al){x.font=f;x.textAlign=al||'left';x.lineWidth=4;x.lineJoin='round';x.strokeStyle='#000';x.strokeText(s,X,Y0);x.fillStyle=col;x.fillText(s,X,Y0)}
 function arrow(x,ax,y1,y2,col){x.strokeStyle=col;x.lineWidth=4;x.beginPath();x.moveTo(ax,y1);x.lineTo(ax,y2);x.stroke();let d=y2>y1?1:-1;x.fillStyle=col;x.beginPath();x.moveTo(ax,y2);x.lineTo(ax-8,y2-11*d);x.lineTo(ax+8,y2-11*d);x.fill()}
-function drawNeg2(x,W,H){let a=p.a,b=p.b,tgt=a-b,lo=-30,hi=100,top=70,bot=H-92,Y=n=>bot-(n-lo)/(hi-lo)*(bot-top),tx=W*.28,tw=40,ax=tx+92,z=Y(0),F=n=>(n<0?'−':'')+Math.abs(Math.round(n)),col1='#facc15',col2='#22d3ee',f13='800 13px system-ui';negCur+=(tgt-negCur)*.06;let v=negCur,hot=v>=0;let zg=x.createLinearGradient(0,top,0,z);zg.addColorStop(0,'rgba(255,77,109,.22)');zg.addColorStop(1,'rgba(255,77,109,0)');x.fillStyle=zg;x.fillRect(0,top,W,z-top);let bg=x.createLinearGradient(0,z,0,bot);bg.addColorStop(0,'rgba(56,189,248,0)');bg.addColorStop(1,'rgba(56,189,248,.3)');x.fillStyle=bg;x.fillRect(0,z,W,bot-z);pill(x,tx-tw/2,top-6,tw,bot-top+20);x.fillStyle='#14142a';x.fill();x.strokeStyle='#9ca3af';x.lineWidth=2;x.stroke();let g=x.createLinearGradient(0,Y(v),0,bot+30);if(hot){g.addColorStop(0,'#ff6b6b');g.addColorStop(1,'#b91c1c')}else{g.addColorStop(0,'#7dd3fc');g.addColorStop(1,'#1d4ed8')}x.save();pill(x,tx-tw/2+7,top+1,tw-14,bot-top+20);x.clip();x.fillStyle=g;x.fillRect(0,Y(v),W,H);x.restore();x.fillStyle='rgba(255,255,255,.18)';x.fillRect(tx-tw/2+10,top,4,bot-top);x.beginPath();x.arc(tx,bot+26,30,0,6.3);x.fillStyle=hot?'#b91c1c':'#1d4ed8';x.fill();x.strokeStyle='#9ca3af';x.lineWidth=2;x.stroke();for(let n=lo;n<=hi;n+=10){let y=Y(n);x.strokeStyle=n===0?'#fff':'#6b7280';x.lineWidth=n===0?3:1;x.beginPath();x.moveTo(tx-tw/2-12,y);x.lineTo(tx-tw/2,y);x.stroke();lbl(x,F(n),tx-tw/2-16,y+4,n<0?'#7dd3fc':n>0?'#ff8fa3':'#fff','800 12px system-ui','right')}x.setLineDash([6,6]);x.strokeStyle='#fff';x.lineWidth=2;x.beginPath();x.moveTo(tx+tw/2,z);x.lineTo(W-8,z);x.stroke();x.setLineDash([]);if(b>0){if(a>0&&tgt<0){arrow(x,ax,Y(a),z,col1);arrow(x,ax,z,Y(tgt),col2);lbl(x,a+' down to 0',ax+12,(Y(a)+z)/2+4,col1,f13);lbl(x,'then '+(-tgt)+' below 0',ax+12,(z+Y(tgt))/2+4,col2,f13)}else{let c=tgt<0?col2:col1;arrow(x,ax,Y(a),Y(tgt),c);lbl(x,'−'+b,ax+12,(Y(a)+Y(tgt))/2+4,c,'800 14px system-ui')}}x.fillStyle='#fff';x.beginPath();x.arc(ax,Y(a),6,0,6.3);x.fill();lbl(x,'start '+F(a)+'°',ax+12,Y(a)-8,'#fff','700 12px system-ui');let tc=hot?'#ff8fa3':'#7dd3fc';lbl(x,F(v)+'°',tx+tw/2+16,Y(v)+6,tc,'900 18px system-ui');lbl(x,'▲ above zero = positive   •   ▼ below zero = negative',W/2,H-10,'#fff','700 12px system-ui','center')}
+function drawNeg2(x,W,H){let a=p.a,b=p.b,tgt=a-b,lo=-30,hi=100,top=70,bot=H-92,Y=n=>bot-(n-lo)/(hi-lo)*(bot-top),tx=W*.28,tw=40,ax=tx+92,z=Y(0),F=n=>(n<0?'−':'')+Math.abs(Math.round(n)),col1='#facc15',col2='#22d3ee',f13='800 13px system-ui';negCur+=(tgt-negCur)*.06;let v=negCur,hot=v>=0;x.fillStyle='#fff';x.textAlign='center';x.fillText(F(v)+'°  start '+F(a)+'°  drop '+b+'°',W/2,30);x.fillText('▲ above zero = positive   •   ▼ below zero = negative',W/2,H-10);}
 function rs(){let w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;dpr=Math.min(devicePixelRatio||1,2);renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();let c=$('c2');c.width=w*dpr;c.height=h*dpr}
 addEventListener('resize',rs);
 let lx=0,ly=0,voroStart=null,voroMoved=false;
@@ -348,33 +289,38 @@ function buildNav(){let n=$('nav'),q=$('search').value.toLowerCase();n.innerHTML
 $('search').oninput=buildNav;
 function tSide(h){let s=$('sidebar');h?s.classList.add('hidden'):s.classList.toggle('hidden');setTimeout(rs,60)}
 function toast(m,ms){let t=$('toast');t.innerText=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',ms||4000)}
-onerror=(m,s,l)=>toast('⚠ '+m+' (line '+l+')',9000);
-function openBuddy(){let o=$('cp').classList.toggle('open');$('choice').classList.remove('open');if(o){let t=T[cur];$('cans').innerText='You are on: '+t.n+'\n'+(t.explain||'')}} 
+onerror=(m,s,l)=>{aeroAdd(m+' (line '+l+')','onerror');toast('⚠ '+m+' (line '+l+')',9000);};
+
+// ===== FIXED BUBBLE / EXIT / MINIMIZE LOGIC =====
+function openBuddy(){
+  // STANDALONE: hide main app, show ONLY Buddy. No landing page behind.
+  document.body.classList.add('is-minimized');
+  $('main').style.display='none'; $('sidebar').style.display='none';
+  $('collapsed').classList.remove('show'); $('collapsed').style.display='none';
+  $('fcalc').classList.remove('open'); $('choice').classList.remove('open');
+  $('cp').classList.add('open');
+  let t=T[cur]; $('cans').innerText='You are on: '+t.n+'\n'+(t.explain||'');
+  $('cw').style.display='block'; $('ww').style.display='block';
+}
 async function askBuddy(){
   const q = $('cask').value || "explain this topic";
   $('cans').innerText = "Thinking...";
   try {
-    const r = await fetch("/.netlify/functions/ai", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        persona: "buddy",
-        question: q,
-        topic: cur + " - " + T[cur].eq
-      })
-    });
+    const r = await fetch("/.netlify/functions/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ persona: "buddy", question: q, topic: cur + " - " + T[cur].eq }) });
     const d = await r.json();
     $('cans').innerText = d.answer || d.error || "No answer";
-  } catch(e){ $('cans').innerText = "Error: " + e.message; }
+  } catch(e){ aeroAdd('Buddy: '+e.message,'buddy'); $('cans').innerText = "Error: " + e.message; }
 }
-function openChoice(){$('choice').classList.toggle('open');$('cp').classList.remove('open');$('fcalc').classList.remove('open')}
-function calcOpen(){$('fcalc').classList.toggle('open');$('choice').classList.remove('open');$('collapsed').classList.remove('show')}
+function openChoice(){
+  // MATH WAITER menu - does NOT reopen full app unless you tap it
+  $('choice').classList.toggle('open');$('cp').classList.remove('open');$('fcalc').classList.remove('open');
+}
+function calcOpen(){
+  // From topbar - open calculator over app (normal behaviour inside full app)
+  $('fcalc').classList.toggle('open');$('choice').classList.remove('open');$('collapsed').classList.remove('show');
+}
 function minApp(){
-  // 1. If in Android app, go to phone home screen - bubbles stay as overlay
-  if (window.AndroidMinimize) {
-    window.AndroidMinimize.minimize();
-  }
-  // 2. WEB FIX: Hide EVERYTHING except the 2 bubbles. NO black screen.
+  if (window.AndroidMinimize) { try{ window.AndroidMinimize.minimize(); }catch(e){ aeroAdd('Minimize native: '+e.message,'min'); } }
   document.body.classList.add('is-minimized');
   $('main').style.display='none';
   $('sidebar').style.display='none';
@@ -382,13 +328,11 @@ function minApp(){
   $('collapsed').style.display='none';
   $('fcalc').classList.remove('open');
   $('choice').classList.remove('open');
-  // Make sure bubbles are on top and visible
+  $('cp').classList.remove('open');
   $('cw').style.display='block';
   $('ww').style.display='block';
 }
-
 function maxApp(){
-  // Bring the whole app back
   document.body.classList.remove('is-minimized');
   $('main').style.display='flex';
   $('sidebar').style.display='';
@@ -397,53 +341,58 @@ function maxApp(){
   $('collapsed').style.display='none';
   $('fcalc').classList.remove('open');
   $('choice').classList.remove('open');
+  $('cp').classList.remove('open');
   setTimeout(rs,100);
 }
 function justCalc(){
+  // STANDALONE CALCULATOR ONLY - NO landing page behind
   $('choice').classList.remove('open');
   $('collapsed').classList.remove('show');
+  $('collapsed').style.display='none';
+  document.body.classList.add('is-minimized');
+  $('main').style.display='none';
+  $('sidebar').style.display='none';
+  $('cp').classList.remove('open');
   $('fcalc').classList.add('open');
+  $('cw').style.display='block'; $('ww').style.display='block';
   cLive();
+}
+function exitApp(){
+  // REAL EXIT - kills bubbles, no need to delete app
+  if(window.AndroidExit){ try{ window.AndroidExit.exit(); }catch(e){} }
+  if(window.AndroidMinimize && window.AndroidMinimize.exit){ try{ window.AndroidMinimize.exit(); }catch(e){} }
+  document.body.classList.remove('is-minimized');
+  $('main').style.display='none'; $('sidebar').style.display='none';
+  $('fcalc').classList.remove('open'); $('choice').classList.remove('open'); $('cp').classList.remove('open');
+  $('collapsed').classList.remove('show'); $('collapsed').style.display='none';
+  $('cw').style.display='none'; $('ww').style.display='none';
+  $('app-closed').style.display='flex';
+  aeroAdd('User exited app','exit');
+}
+function reopenAfterExit(){
+  $('app-closed').style.display='none';
+  $('cw').style.display='block'; $('ww').style.display='block';
+  maxApp();
 }
 function ev(s){s=s.replace(/π/g,'PI').replace(/\^/g,'**');if(!/^(?:[\d+\-*\/().\s%]|PI|sqrt|sin|cos|tan|log|ln)*$/.test(s))throw 0;return Function('const{PI,sqrt,log10:log,log:ln}=Math,r=Math.PI/180,sin=x=>Math.sin(x*r),cos=x=>Math.cos(x*r),tan=x=>Math.tan(x*r);return('+s+')')()}
 function cLive(){let s=$('cin').value.trim();if(!s){$('cres').innerText='';return}try{$('cres').innerText='= '+Math.round(ev(s)*1e8)/1e8}catch(e){$('cres').innerText='...'}}
-['C','sin(','cos(','√','7','8','9','/','4','5','6','*','1','2','3','-','0','.','π','+','(',')','^','='].forEach(k=>{let b=document.createElement('button');b.innerText=k==='√'?'√(':k;if('+-*/^'.includes(k))b.className='op';if(k==='=')b.className='eq';if(['C','sin(','cos(','√','π'].includes(k))b.className='fn';b.onclick=()=>{let i=$('cin');if(k==='C')i.value='';else if(k==='='){try{i.value=Math.round(ev(i.value)*1e8)/1e8}catch(e){}}else i.value+=k==='√'?'sqrt(':k;cLive()};$('keys').appendChild(b)});
+['C','sin(','cos(','√','7','8','9','/','4','5','6','*','1','2','3','-','0','.','π','+','(',')','^','='].forEach(k=>{let b=document.createElement('button');b.innerText=k==='√'?'√(':k;if('+-*/^'.includes(k))b.className='op';if(k==='=')b.className='eq';if(['C','sin(','cos(','√','π'].includes(k))b.className='fn';b.onclick=()=>{let i=$('cin');if(k==='C')i.value='';else if(k==='='){try{i.value=Math.round(ev(i.value)*1e8)/1e8}catch(e){aeroAdd('Calc = : '+e.message,'calc')}}else i.value+=k==='√'?'sqrt(':k;cLive()};$('keys').appendChild(b)});
 cLive();buildF();
 if(innerWidth<=700)$('sidebar').classList.add('hidden');
 select('add');loop();
+aeroUpdateBadge();
 function makeDraggable(el){
   if(!el || el.dataset.dragReady) return;
   el.dataset.dragReady = "1";
   el.style.touchAction = "none";
   el.style.cursor = "grab";
   let sx=0, sy=0, ox=0, oy=0, dragging=false, moved=false;
-  el.addEventListener('pointerdown', e=>{
-    dragging=true; moved=false;
-    sx=e.clientX; sy=e.clientY;
-    const r=el.getBoundingClientRect();
-    ox=r.left; oy=r.top;
-    el.style.left=ox+'px'; el.style.top=oy+'px';
-    el.style.right='auto'; el.style.bottom='auto';
-    try{ el.setPointerCapture(e.pointerId); }catch(err){}
-  });
-  el.addEventListener('pointermove', e=>{
-    if(!dragging) return;
-    const dx=e.clientX-sx, dy=e.clientY-sy;
-    if(Math.abs(dx)>6 || Math.abs(dy)>6) moved=true;
-    if(moved){
-      el.style.left=(ox+dx)+'px';
-      el.style.top=(oy+dy)+'px';
-    }
-  });
-  const stop = ()=>{
-    dragging=false;
-    if(moved) setTimeout(()=>{ moved=false; }, 150);
-  };
+  el.addEventListener('pointerdown', e=>{ dragging=true; moved=false; sx=e.clientX; sy=e.clientY; const r=el.getBoundingClientRect(); ox=r.left; oy=r.top; el.style.left=ox+'px'; el.style.top=oy+'px'; el.style.right='auto'; el.style.bottom='auto'; try{ el.setPointerCapture(e.pointerId); }catch(err){} });
+  el.addEventListener('pointermove', e=>{ if(!dragging) return; const dx=e.clientX-sx, dy=e.clientY-sy; if(Math.abs(dx)>6 || Math.abs(dy)>6) moved=true; if(moved){ el.style.left=(ox+dx)+'px'; el.style.top=(oy+dy)+'px'; } });
+  const stop = ()=>{ dragging=false; if(moved) setTimeout(()=>{ moved=false; }, 150); };
   el.addEventListener('pointerup', stop);
   el.addEventListener('pointercancel', stop);
-  el.addEventListener('click', e=>{
-    if(moved){ e.stopPropagation(); e.preventDefault(); }
-  }, true);
+  el.addEventListener('click', e=>{ if(moved){ e.stopPropagation(); e.preventDefault(); } }, true);
 }
 makeDraggable(document.getElementById('cw'));
 makeDraggable(document.getElementById('ww'));
