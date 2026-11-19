@@ -54,6 +54,8 @@ input[type=range]{accent-color:var(--ac);padding:0;height:28px}
 #rush h3{color:#facc15;font-size:15px}#rush .timer{height:10px;background:#222;border-radius:999px;overflow:hidden;margin:8px 0}#rush .tfill{height:100%;background:#22d3ee;width:100%}
 #rush .ans{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}#rush .ans button{padding:12px;border-radius:12px;background:#fff;color:#000;font-weight:900;font-size:18px;border:0}
 @media(min-width:900px){#panel,#fv{max-width:760px;margin:0 auto;width:100%}}
+body.is-minimized{background:transparent !important}
+body.is-minimized #main, body.is-minimized #sidebar{display:none !important}
 </style></head><body>
 <div id="sidebar"><div class="logo">WAVELORD <i>MATH LAB</i></div><div class="welcome"><h2>👋 Welcome!</h2><p>Pick a topic, or ask ∑ Math Buddy, or play 🎮 Rush!</p><button onclick="tSide(1)">Start → hide</button></div><input id="search" placeholder="Search... primes, tables, cymatics, lorenz"><div id="nav"></div></div>
 <div id="main"><div id="topbar"><button class="tb" onclick="tSide()">☰</button><h2 id="tt"></h2><button class="tb pri" onclick="calcOpen()">🧮</button><button class="tb pri" onclick="showF()">📐</button><button class="tb pri" onclick="document.getElementById('info').scrollIntoView({behavior:'smooth'})">ℹ️</button><button class="tb" onclick="minApp()">⌄</button></div>
@@ -368,15 +370,31 @@ async function askBuddy(){
 function openChoice(){$('choice').classList.toggle('open');$('cp').classList.remove('open');$('fcalc').classList.remove('open')}
 function calcOpen(){$('fcalc').classList.toggle('open');$('choice').classList.remove('open');$('collapsed').classList.remove('show')}
 function minApp(){
+  // 1. If in Android app, go to phone home screen - bubbles stay as overlay
   if (window.AndroidMinimize) {
     window.AndroidMinimize.minimize();
-    return;
   }
-  $('collapsed').classList.add('show');
-}
-function maxApp(){
-  $('main').style.display='flex';
+  // 2. WEB FIX: Hide EVERYTHING except the 2 bubbles. NO black screen.
+  document.body.classList.add('is-minimized');
+  $('main').style.display='none';
+  $('sidebar').style.display='none';
   $('collapsed').classList.remove('show');
+  $('collapsed').style.display='none';
+  $('fcalc').classList.remove('open');
+  $('choice').classList.remove('open');
+  // Make sure bubbles are on top and visible
+  $('cw').style.display='block';
+  $('ww').style.display='block';
+}
+
+function maxApp(){
+  // Bring the whole app back
+  document.body.classList.remove('is-minimized');
+  $('main').style.display='flex';
+  $('sidebar').style.display='';
+  if(innerWidth<=700) $('sidebar').classList.add('hidden');
+  $('collapsed').classList.remove('show');
+  $('collapsed').style.display='none';
   $('fcalc').classList.remove('open');
   $('choice').classList.remove('open');
   setTimeout(rs,100);
