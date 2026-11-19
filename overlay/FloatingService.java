@@ -123,9 +123,11 @@ public class FloatingService extends Service {
         currentTarget = target;
 
         FrameLayout layout = new FrameLayout(this);
-        layout.setBackgroundColor(Color.WHITE);
+        layout.setBackgroundColor(Color.TRANSPARENT);
 
         WebView web = new WebView(this);
+        web.setBackgroundColor(Color.TRANSPARENT);
+        web.setBackgroundColor(0x00000000);
         web.getSettings().setJavaScriptEnabled(true);
         web.getSettings().setDomStorageEnabled(true);
         web.setWebViewClient(new WebViewClient());
