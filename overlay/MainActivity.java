@@ -2,8 +2,6 @@ package com.wavelord.mathlab;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,18 +31,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
         FrameLayout root = new FrameLayout(this);
-        root.setBackgroundColor(Color.TRANSPARENT);
         root.setLayoutParams(new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(root);
 
         webView = new WebView(this);
-        webView.setBackgroundColor(Color.TRANSPARENT);
-        webView.setBackgroundColor(0x00000000);
         webView.setLayoutParams(new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT));
@@ -87,11 +80,6 @@ public class MainActivity extends Activity {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, OVERLAY_REQ);
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     @Override
