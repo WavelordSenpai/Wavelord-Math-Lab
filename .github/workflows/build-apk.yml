@@ -14,27 +14,57 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
-      - name: Install Pillow for icon resize
-        run: |
-          python3 -m pip install --upgrade pip
-          pip3 install Pillow
-      - name: Build APK
+          java-version: '17'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Prepare Web
         run: |
           npm install
           mkdir -p www
           cp index.html www/index.html
           cp manifest.json www/manifest.json || true
           npx cap init "Wavelord Math Lab" com.wavelord.mathlab --web-dir=www || true
-          if [ ! -d android ]; then npx cap add android || true; fi
+          if [ ! -d android ]; then npx cap add android; fi
           npx cap sync android
+
+      - name: Check Overlay Files
+        run: |
+          echo "=== overlay/ ==="
+          ls -la overlay/ || echo "NO overlay folder"
+          echo "=== overlay java heads ==="
+          head -n 20 overlay/*.java || true
+          echo "=== android manifest after sync ==="
+          cat android/app/src/main/AndroidManifest.xml
+
+      - name: Apply Overlay + Manifest AFTER sync
+        run: |
+          DEST=android/app/src/main/java/com/wavelord/mathlab
+          mkdir -p $DEST
+          if [ -d overlay ]; then
+            rm -f $DEST/*.java
+            cp overlay/*.java $DEST/
+            # Fix package even if it has leading spaces
+            sed -i -E 's/^[[:space:]]*package[[:space:]]+[^;]+;/package com.wavelord.mathlab;/' $DEST/*.java
+            echo "=== packages after sed ==="
+            grep -H "^package" $DEST/*.java
+          fi
+          if [ -f AndroidManifest.xml ]; then
+            cp AndroidManifest.xml android/app/src/main/AndroidManifest.xml
+            echo "=== custom manifest ==="
+            cat android/app/src/main/AndroidManifest.xml
+          fi
+
+      - name: Build Icons - FIXED background
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install Pillow
           python3 -c "
           from PIL import Image
           import os
           src = 'icon-512.png' if os.path.exists('icon-512.png') else 'icon-192.png'
           print('USING ICON:', src)
           im = Image.open(src).convert('RGBA')
-          # Full icon for legacy + foreground for adaptive
           sizes = {'mipmap-mdpi':48,'mipmap-hdpi':72,'mipmap-xhdpi':96,'mipmap-xxhdpi':144,'mipmap-xxxhdpi':192}
           for folder, size in sizes.items():
               p = f'android/app/src/main/res/{folder}'
@@ -42,32 +72,22 @@ jobs:
               im.resize((size, size), Image.LANCZOS).save(f'{p}/ic_launcher.png')
               im.resize((size, size), Image.LANCZOS).save(f'{p}/ic_launcher_round.png')
               im.resize((size, size), Image.LANCZOS).save(f'{p}/ic_launcher_foreground.png')
-              # Solid background for adaptive icon
-              bg = Image.new('RGBA', (size, size), (106, 17, 203, 255))
-              bg.save(f'{p}/ic_launcher_background.png')
-          # Adaptive icon XMLs - this is what the Install screen uses
+          # Background as COLOR drawable, not PNG - this fixes aapt
+          os.makedirs('android/app/src/main/res/drawable', exist_ok=True)
+          open('android/app/src/main/res/drawable/ic_launcher_background.xml','w').write('<?xml version=\"1.0\" encoding=\"utf-8\"?><shape xmlns:android=\"http://schemas.android.com/apk/res/android\"><solid android:color=\"#6A11CB\"/></shape>')
           anydpi = 'android/app/src/main/res/mipmap-anydpi-v26'
           os.makedirs(anydpi, exist_ok=True)
-          open(f'{anydpi}/ic_launcher.xml','w').write('<?xml version=\"1.0\" encoding=\"utf-8\"?><adaptive-icon xmlns:android=\"http://schemas.android.com/apk/res/android\"><background android:drawable=\"@mipmap/ic_launcher_background\"/><foreground android:drawable=\"@mipmap/ic_launcher_foreground\"/></adaptive-icon>')
-          open(f'{anydpi}/ic_launcher_round.xml','w').write('<?xml version=\"1.0\" encoding=\"utf-8\"?><adaptive-icon xmlns:android=\"http://schemas.android.com/apk/res/android\"><background android:drawable=\"@mipmap/ic_launcher_background\"/><foreground android:drawable=\"@mipmap/ic_launcher_foreground\"/></adaptive-icon>')
+          open(f'{anydpi}/ic_launcher.xml','w').write('<?xml version=\"1.0\" encoding=\"utf-8\"?><adaptive-icon xmlns:android=\"http://schemas.android.com/apk/res/android\"><background android:drawable=\"@drawable/ic_launcher_background\"/><foreground android:drawable=\"@mipmap/ic_launcher_foreground\"/></adaptive-icon>')
+          open(f'{anydpi}/ic_launcher_round.xml','w').write('<?xml version=\"1.0\" encoding=\"utf-8\"?><adaptive-icon xmlns:android=\"http://schemas.android.com/apk/res/android\"><background android:drawable=\"@drawable/ic_launcher_background\"/><foreground android:drawable=\"@mipmap/ic_launcher_foreground\"/></adaptive-icon>')
           print('icons done')
           "
-          DEST=android/app/src/main/java/com/wavelord/mathlab
-          mkdir -p $DEST
-          if [ -d overlay ]; then
-            rm -f $DEST/*.java
-            cp overlay/*.java $DEST/
-            sed -i 's/^package .*/package com.wavelord.mathlab;/' $DEST/*.java
-          fi
-          if [ -f AndroidManifest.xml ]; then
-            cp AndroidManifest.xml android/app/src/main/AndroidManifest.xml
-          fi
-          mkdir -p android/app/src/main/assets/public
-          cp index.html android/app/src/main/assets/public/index.html
-          cp manifest.json android/app/src/main/assets/public/manifest.json || true
+
+      - name: Build Debug APK - SHOW REAL ERROR
+        run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --stacktrace --info
+
       - uses: actions/upload-artifact@v4
         with:
           name: math-lab-apk
