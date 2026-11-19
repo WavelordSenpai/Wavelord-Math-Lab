@@ -15,8 +15,13 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+
+      - name: Use Preinstalled Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          ls $ANDROID_HOME
+          sdkmanager --list_installed || true
 
       - name: Prepare Web
         run: |
@@ -30,11 +35,8 @@ jobs:
 
       - name: Check Overlay Files
         run: |
-          echo "=== overlay/ ==="
           ls -la overlay/ || echo "NO overlay folder"
-          echo "=== overlay java heads ==="
           head -n 20 overlay/*.java || true
-          echo "=== android manifest after sync ==="
           cat android/app/src/main/AndroidManifest.xml
 
       - name: Apply Overlay + Manifest AFTER sync
@@ -44,18 +46,15 @@ jobs:
           if [ -d overlay ]; then
             rm -f $DEST/*.java
             cp overlay/*.java $DEST/
-            # Fix package even if it has leading spaces
             sed -i -E 's/^[[:space:]]*package[[:space:]]+[^;]+;/package com.wavelord.mathlab;/' $DEST/*.java
-            echo "=== packages after sed ==="
             grep -H "^package" $DEST/*.java
           fi
           if [ -f AndroidManifest.xml ]; then
             cp AndroidManifest.xml android/app/src/main/AndroidManifest.xml
-            echo "=== custom manifest ==="
             cat android/app/src/main/AndroidManifest.xml
           fi
 
-      - name: Build Icons - FIXED background
+      - name: Build Icons
         run: |
           python3 -m pip install --upgrade pip
           pip3 install Pillow
@@ -72,7 +71,6 @@ jobs:
               im.resize((size, size), Image.LANCZOS).save(f'{p}/ic_launcher.png')
               im.resize((size, size), Image.LANCZOS).save(f'{p}/ic_launcher_round.png')
               im.resize((size, size), Image.LANCZOS).save(f'{p}/ic_launcher_foreground.png')
-          # Background as COLOR drawable, not PNG - this fixes aapt
           os.makedirs('android/app/src/main/res/drawable', exist_ok=True)
           open('android/app/src/main/res/drawable/ic_launcher_background.xml','w').write('<?xml version=\"1.0\" encoding=\"utf-8\"?><shape xmlns:android=\"http://schemas.android.com/apk/res/android\"><solid android:color=\"#6A11CB\"/></shape>')
           anydpi = 'android/app/src/main/res/mipmap-anydpi-v26'
@@ -82,7 +80,7 @@ jobs:
           print('icons done')
           "
 
-      - name: Build Debug APK - SHOW REAL ERROR
+      - name: Build Debug APK
         run: |
           cd android
           chmod +x gradlew
