@@ -56,8 +56,10 @@ input[type=range]{accent-color:var(--ac);padding:0;height:28px}
 #rush h3{color:#facc15;font-size:15px}#rush .timer{height:10px;background:#222;border-radius:999px;overflow:hidden;margin:8px 0}#rush .tfill{height:100%;background:#22d3ee;width:100%}
 #rush .ans{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}#rush .ans button{padding:12px;border-radius:12px;background:#fff;color:#000;font-weight:900;font-size:18px;border:0}
 @media(min-width:900px){#panel,#fv{max-width:760px;margin:0 auto;width:100%}}
-body.is-minimized{background:transparent !important}
+html.is-minimized, body.is-minimized{background:transparent !important}
+html:not(.is-minimized), body:not(.is-minimized){background:#07070f !important}
 body.is-minimized #main, body.is-minimized #sidebar{display:none !important}
+body.is-minimized #collapsed{display:none !important}
 body.is-minimized #collapsed{display:none !important}
 body.is-minimized #fcalc{inset:auto 8px 90px 8px}
 body.is-minimized #cp, body.is-minimized #choice{position:fixed}
@@ -293,47 +295,39 @@ onerror=(m,s,l)=>{aeroAdd(m+' (line '+l+')','onerror');toast('⚠ '+m+' (line '+
 
 // ===== FIXED BUBBLE / EXIT / MINIMIZE LOGIC =====
 function openBuddy(){
-  // STANDALONE: hide main app, show ONLY Buddy. No landing page behind.
-  document.body.classList.add('is-minimized');
-  $('main').style.display='none'; $('sidebar').style.display='none';
+  // FIX: Do NOT hide main with transparent - keep app visible behind Buddy
+  // Buddy must stay usable, not floating over white
+  document.body.classList.remove('is-minimized');
+  document.documentElement.classList.remove('is-minimized');
+  $('main').style.display='flex'; $('sidebar').style.display='';
+  if(innerWidth<=700) $('sidebar').classList.add('hidden');
   $('collapsed').classList.remove('show'); $('collapsed').style.display='none';
   $('fcalc').classList.remove('open'); $('choice').classList.remove('open');
   $('cp').classList.add('open');
   let t=T[cur]; $('cans').innerText='You are on: '+t.n+'\n'+(t.explain||'');
   $('cw').style.display='block'; $('ww').style.display='block';
-}
-async function askBuddy(){
-  const q = $('cask').value || "explain this topic";
-  $('cans').innerText = "Thinking...";
-  try {
-    const r = await fetch("/.netlify/functions/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ persona: "buddy", question: q, topic: cur + " - " + T[cur].eq }) });
-    const d = await r.json();
-    $('cans').innerText = d.answer || d.error || "No answer";
-  } catch(e){ aeroAdd('Buddy: '+e.message,'buddy'); $('cans').innerText = "Error: " + e.message; }
-}
-function openChoice(){
-  // MATH WAITER menu - does NOT reopen full app unless you tap it
-  $('choice').classList.toggle('open');$('cp').classList.remove('open');$('fcalc').classList.remove('open');
-}
-function calcOpen(){
-  // From topbar - open calculator over app (normal behaviour inside full app)
-  $('fcalc').classList.toggle('open');$('choice').classList.remove('open');$('collapsed').classList.remove('show');
+  setTimeout(rs,100);
 }
 function minApp(){
-  if (window.AndroidMinimize) { try{ window.AndroidMinimize.minimize(); }catch(e){ aeroAdd('Minimize native: '+e.message,'min'); } }
+  if (window.AndroidMinimize) { try{ window.AndroidMinimize.minimize(); }catch(e){} }
+  // FIX: Close popups BEFORE minimizing, or they get stuck on white screen
+  $('cp').classList.remove('open');
+  $('choice').classList.remove('open');
+  $('fcalc').classList.remove('open');
   document.body.classList.add('is-minimized');
+  document.documentElement.classList.add('is-minimized');
   $('main').style.display='none';
   $('sidebar').style.display='none';
   $('collapsed').classList.remove('show');
   $('collapsed').style.display='none';
-  $('fcalc').classList.remove('open');
-  $('choice').classList.remove('open');
-  $('cp').classList.remove('open');
   $('cw').style.display='block';
   $('ww').style.display='block';
 }
 function maxApp(){
+  // FIX: Always force background back + close popups, or white screen stays
   document.body.classList.remove('is-minimized');
+  document.documentElement.classList.remove('is-minimized');
+  document.body.style.background='#07070f';
   $('main').style.display='flex';
   $('sidebar').style.display='';
   if(innerWidth<=700) $('sidebar').classList.add('hidden');
@@ -345,11 +339,13 @@ function maxApp(){
   setTimeout(rs,100);
 }
 function justCalc(){
-  // STANDALONE CALCULATOR ONLY - NO landing page behind
+  // FIX: Calculator ONLY - but keep background dark, not transparent white
   $('choice').classList.remove('open');
   $('collapsed').classList.remove('show');
   $('collapsed').style.display='none';
-  document.body.classList.add('is-minimized');
+  document.body.classList.remove('is-minimized');
+  document.documentElement.classList.remove('is-minimized');
+  document.body.style.background='#07070f';
   $('main').style.display='none';
   $('sidebar').style.display='none';
   $('cp').classList.remove('open');
