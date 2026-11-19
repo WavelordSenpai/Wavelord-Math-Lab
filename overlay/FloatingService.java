@@ -123,11 +123,9 @@ public class FloatingService extends Service {
         currentTarget = target;
 
         FrameLayout layout = new FrameLayout(this);
-        layout.setBackgroundColor(Color.TRANSPARENT);
+        layout.setBackgroundColor(Color.parseColor("#11111F"));
 
         WebView web = new WebView(this);
-        web.setBackgroundColor(Color.TRANSPARENT);
-        web.setBackgroundColor(0x00000000);
         web.getSettings().setJavaScriptEnabled(true);
         web.getSettings().setDomStorageEnabled(true);
         web.setWebViewClient(new WebViewClient());
@@ -169,6 +167,7 @@ public class FloatingService extends Service {
         closeBtn.setOnClickListener(v -> {
             try { wm.removeView(miniWindow); } catch (Exception e) {}
             miniWindow = null;
+            currentTarget = "";
         });
         top.addView(closeBtn);
 
@@ -182,7 +181,7 @@ public class FloatingService extends Service {
 
         WindowManager.LayoutParams p = new WindowManager.LayoutParams(
             800, 1000, type,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             PixelFormat.TRANSLUCENT);
         p.gravity = Gravity.CENTER;
         miniWindow = layout;
@@ -199,4 +198,4 @@ public class FloatingService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) { return null; }
-}
+            }
