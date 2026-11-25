@@ -11,6 +11,10 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
+import android.webkit.PermissionRequest;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -19,62 +23,78 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class FloatingService extends Service {
+    private static final String APP_URL = "https://wavelord-math-lab.netlify.app/";
     private WindowManager wm;
-    private View buddyView, waiterView;
+    private View buddyBubble;
+    private View menuCard = null;
     private View miniWindow = null;
-    private String currentTarget = "";
+
+    public class OverlayBridge {
+        @JavascriptInterface
+        public void returnToApp() {
+            launchMainApp(null);
+        }
+
+        @JavascriptInterface
+        public void exitOverlay() {
+            stopSelf();
+        }
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-        buddyView = makeBubble("Σ", "MATH BUDDY", "#22D3EE", 20, 700, "buddy");
-        waiterView = makeBubble("🧮", "WAITER", "#8B5CF6", 800, 700, "waiter");
-        wm.addView(buddyView, (WindowManager.LayoutParams) buddyView.getTag());
-        wm.addView(waiterView, (WindowManager.LayoutParams) waiterView.getTag());
+        buddyBubble = makeWaveBuddyBubble(32, 620);
+        wm.addView(buddyBubble, (WindowManager.LayoutParams) buddyBubble.getTag());
     }
 
-    private View makeBubble(String emoji, String label, String colorHex, int startX, int startY, String target) {
+    private int overlayWindowType() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+            ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+            : WindowManager.LayoutParams.TYPE_PHONE;
+    }
+
+    private View makeWaveBuddyBubble(int startX, int startY) {
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.VERTICAL);
         container.setGravity(Gravity.CENTER);
 
+        // Calculator-inspired dark orb matching app icon aesthetic
+        TextView bubble = new TextView(this);
+        bubble.setText("🧮");
+        bubble.setTextSize(26);
+        bubble.setTextColor(Color.WHITE);
+        bubble.setGravity(Gravity.CENTER);
+        bubble.setWidth(148);
+        bubble.setHeight(148);
+        GradientDrawable bubbleBg = new GradientDrawable(
+            GradientDrawable.Orientation.TL_BR,
+            new int[] { Color.parseColor("#141728"), Color.parseColor("#070811") }
+        );
+        bubbleBg.setCornerRadius(40f);
+        bubbleBg.setStroke(5, Color.parseColor("#22D3EE"));
+        bubble.setBackground(bubbleBg);
+
         TextView labelView = new TextView(this);
-        labelView.setText(label);
-        labelView.setTextSize(8);
-        labelView.setTextColor(Color.WHITE);
-        labelView.setPadding(12, 6, 12, 6);
+        labelView.setText("WAVE BUDDY");
+        labelView.setTextSize(9);
+        labelView.setTextColor(Color.parseColor("#F8FAFC"));
+        labelView.setPadding(16, 5, 16, 5);
         GradientDrawable labelBg = new GradientDrawable();
-        labelBg.setColor(Color.BLACK);
+        labelBg.setColor(Color.parseColor("#070811"));
         labelBg.setCornerRadius(50);
-        labelBg.setStroke(2, Color.WHITE);
+        labelBg.setStroke(2, Color.parseColor("#A78BFA"));
         labelView.setBackground(labelBg);
         labelView.setGravity(Gravity.CENTER);
 
-        TextView bubble = new TextView(this);
-        bubble.setText(emoji);
-        bubble.setTextSize(24);
-        bubble.setTextColor(Color.WHITE);
-        bubble.setGravity(Gravity.CENTER);
-        bubble.setWidth(120);
-        bubble.setHeight(120);
-        GradientDrawable bubbleBg = new GradientDrawable();
-        bubbleBg.setShape(GradientDrawable.OVAL);
-        bubbleBg.setColor(Color.parseColor(colorHex));
-        bubbleBg.setStroke(4, Color.WHITE);
-        bubble.setBackground(bubbleBg);
-
-        container.addView(labelView);
         container.addView(bubble);
-
-        int type = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-            ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-            : WindowManager.LayoutParams.TYPE_PHONE;
+        container.addView(labelView);
 
         WindowManager.LayoutParams p = new WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
-            type,
+            overlayWindowType(),
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT);
         p.gravity = Gravity.TOP | Gravity.START;
@@ -85,6 +105,7 @@ public class FloatingService extends Service {
         container.setOnTouchListener(new View.OnTouchListener() {
             float downX, downY, dx, dy;
             boolean moved = false;
+
             @Override
             public boolean onTouch(View v, MotionEvent e) {
                 WindowManager.LayoutParams lp = (WindowManager.LayoutParams) v.getTag();
@@ -105,7 +126,7 @@ public class FloatingService extends Service {
                         wm.updateViewLayout(v, lp);
                         return true;
                     case MotionEvent.ACTION_UP:
-                        if (!moved) openMiniWindow(target);
+                        if (!moved) toggleQuickMenu();
                         return true;
                 }
                 return false;
@@ -114,73 +135,170 @@ public class FloatingService extends Service {
         return container;
     }
 
-    private void openMiniWindow(String target) {
-        if (miniWindow != null) {
-            try { wm.removeView(miniWindow); } catch (Exception e) {}
-            miniWindow = null;
-            if (target.equals(currentTarget)) return;
+    private void closeMenuCard() {
+        if (menuCard != null) {
+            try { wm.removeView(menuCard); } catch (Exception ignored) {}
+            menuCard = null;
         }
-        currentTarget = target;
+    }
+
+    private void closeMiniWindow() {
+        if (miniWindow != null) {
+            try { wm.removeView(miniWindow); } catch (Exception ignored) {}
+            miniWindow = null;
+        }
+    }
+
+    private void toggleQuickMenu() {
+        if (miniWindow != null) {
+            closeMiniWindow();
+            return;
+        }
+        if (menuCard != null) {
+            closeMenuCard();
+            return;
+        }
+
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(28, 24, 28, 24);
+        GradientDrawable cardBg = new GradientDrawable();
+        cardBg.setColor(Color.parseColor("#101220"));
+        cardBg.setCornerRadius(42f);
+        cardBg.setStroke(4, Color.parseColor("#22D3EE"));
+        card.setBackground(cardBg);
+
+        TextView heading = new TextView(this);
+        heading.setText("🧮 WAVE BUDDY");
+        heading.setTextColor(Color.WHITE);
+        heading.setTextSize(16);
+        heading.setPadding(8, 0, 8, 16);
+        card.addView(heading);
+
+        card.addView(makeMenuButton("💬 Talk to AI (Voice + Text)", "#22D3EE", "#070811", v -> {
+            closeMenuCard();
+            openMiniWindow("buddy");
+        }));
+        card.addView(makeMenuButton("🧮 Use Calculator", "#A78BFA", "#070811", v -> {
+            closeMenuCard();
+            openMiniWindow("calc");
+        }));
+        card.addView(makeMenuButton("↗ Return to App", "#1B1F36", "#F8FAFC", v -> {
+            closeMenuCard();
+            launchMainApp(null);
+        }));
+        card.addView(makeMenuButton("✕ Exit App", "#3B151B", "#FCA5A5", v -> {
+            closeMenuCard();
+            closeMiniWindow();
+            stopSelf();
+        }));
+
+        WindowManager.LayoutParams p = new WindowManager.LayoutParams(
+            760,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            overlayWindowType(),
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+            PixelFormat.TRANSLUCENT);
+        p.gravity = Gravity.CENTER;
+        menuCard = card;
+        wm.addView(menuCard, p);
+    }
+
+    private Button makeMenuButton(String label, String bgHex, String fgHex, View.OnClickListener listener) {
+        Button btn = new Button(this);
+        btn.setText(label);
+        btn.setAllCaps(false);
+        btn.setTextColor(Color.parseColor(fgHex));
+        btn.setTextSize(14);
+        btn.setPadding(24, 20, 24, 20);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(Color.parseColor(bgHex));
+        bg.setCornerRadius(24f);
+        btn.setBackground(bg);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        lp.bottomMargin = 14;
+        btn.setLayoutParams(lp);
+        btn.setOnClickListener(listener);
+        return btn;
+    }
+
+    private void launchMainApp(String target) {
+        Intent i = new Intent(FloatingService.this, MainActivity.class);
+        if (target != null) i.putExtra("open", target);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
+    }
+
+    private void openMiniWindow(String target) {
+        closeMiniWindow();
 
         FrameLayout layout = new FrameLayout(this);
-        layout.setBackgroundColor(Color.parseColor("#11111F"));
+        layout.setBackgroundColor(Color.parseColor("#070811"));
 
         WebView web = new WebView(this);
-        web.getSettings().setJavaScriptEnabled(true);
-        web.getSettings().setDomStorageEnabled(true);
+        WebSettings ws = web.getSettings();
+        ws.setJavaScriptEnabled(true);
+        ws.setDomStorageEnabled(true);
+        ws.setAllowFileAccess(true);
+        ws.setAllowContentAccess(true);
+        ws.setMediaPlaybackRequiresUserGesture(false);
+        web.addJavascriptInterface(new OverlayBridge(), "AndroidOverlay");
         web.setWebViewClient(new WebViewClient());
-        if (target.equals("buddy")) {
-            web.loadUrl("https://wavelord-math-lab.netlify.app/?open=buddy");
-        } else {
-            web.loadUrl("https://wavelord-math-lab.netlify.app/?open=waiter");
-        }
+        web.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onPermissionRequest(final PermissionRequest request) {
+                request.grant(request.getResources());
+            }
+        });
+        web.loadUrl(APP_URL + "?open=" + target);
+
         FrameLayout.LayoutParams webParams = new FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT);
-        webParams.topMargin = 120;
+        webParams.topMargin = 128;
         layout.addView(web, webParams);
 
         LinearLayout top = new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL);
-        top.setBackgroundColor(Color.BLACK);
-        top.setPadding(20, 20, 20, 20);
+        top.setBackgroundColor(Color.parseColor("#0E101C"));
+        top.setPadding(20, 16, 20, 16);
+        top.setGravity(Gravity.CENTER_VERTICAL);
 
         TextView title = new TextView(this);
-        title.setText(target.equals("buddy") ? "Σ MATH BUDDY" : "🧮 WAITER");
+        title.setText(target.equals("buddy") ? "💬 WAVE BUDDY AI" : "🧮 CALCULATOR");
         title.setTextColor(Color.WHITE);
-        title.setTextSize(16);
+        title.setTextSize(15);
         LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
         top.addView(title, titleParams);
 
         Button fullBtn = new Button(this);
-        fullBtn.setText("Full App");
-        fullBtn.setOnClickListener(v -> {
-            Intent i = new Intent(FloatingService.this, MainActivity.class);
-            i.putExtra("open", target);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(i);
-        });
+        fullBtn.setText("Return");
+        fullBtn.setAllCaps(false);
+        fullBtn.setOnClickListener(v -> launchMainApp(target));
         top.addView(fullBtn);
 
-        Button closeBtn = new Button(this);
-        closeBtn.setText("X");
-        closeBtn.setOnClickListener(v -> {
-            try { wm.removeView(miniWindow); } catch (Exception e) {}
-            miniWindow = null;
-            currentTarget = "";
+        Button collapseBtn = new Button(this);
+        collapseBtn.setText("⌄");
+        collapseBtn.setOnClickListener(v -> closeMiniWindow());
+        top.addView(collapseBtn);
+
+        Button exitBtn = new Button(this);
+        exitBtn.setText("✕");
+        exitBtn.setOnClickListener(v -> {
+            closeMiniWindow();
+            stopSelf();
         });
-        top.addView(closeBtn);
+        top.addView(exitBtn);
 
         FrameLayout.LayoutParams topParams = new FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT, 120);
+            FrameLayout.LayoutParams.MATCH_PARENT, 128);
         layout.addView(top, topParams);
 
-        int type = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-            ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-            : WindowManager.LayoutParams.TYPE_PHONE;
-
         WindowManager.LayoutParams p = new WindowManager.LayoutParams(
-            800, 1000, type,
+            920, 1260, overlayWindowType(),
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             PixelFormat.TRANSLUCENT);
         p.gravity = Gravity.CENTER;
@@ -191,11 +309,11 @@ public class FloatingService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        try { if (buddyView != null) wm.removeView(buddyView); } catch (Exception e) {}
-        try { if (waiterView != null) wm.removeView(waiterView); } catch (Exception e) {}
-        try { if (miniWindow != null) wm.removeView(miniWindow); } catch (Exception e) {}
+        try { if (buddyBubble != null) wm.removeView(buddyBubble); } catch (Exception ignored) {}
+        closeMenuCard();
+        closeMiniWindow();
     }
 
     @Override
     public IBinder onBind(Intent intent) { return null; }
-            }
+}

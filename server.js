@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json({ limit: '15mb' }));
+app.use(express.json({ limit: '25mb' }));
 
 let geminiClient = null;
 function getGeminiClient() {
@@ -185,12 +185,14 @@ app.post('/api/transcribe', async (req, res) => {
     }
 
     let lastGeminiErr = null;
+    const cleanMime = String(mimeType || 'audio/webm').split(';')[0].trim().toLowerCase();
+    const geminiMime = cleanMime === 'audio/opus' ? 'audio/ogg' : cleanMime;
     if (process.env.GEMINI_API_KEY) {
       try {
         const ai = getGeminiClient();
         const audioPart = {
           inlineData: {
-            mimeType: mimeType || 'audio/webm',
+            mimeType: geminiMime,
             data: audioBase64,
           },
         };
@@ -199,7 +201,7 @@ app.post('/api/transcribe', async (req, res) => {
           contents: {
             parts: [
               audioPart,
-              { text: 'Transcribe this spoken audio accurately into clean plain text. Return only the transcribed words.' },
+              { text: 'Transcribe this spoken voice note accurately into clean plain text. Return only the transcribed words.' },
             ],
           },
         });
@@ -213,10 +215,13 @@ app.post('/api/transcribe', async (req, res) => {
 
     if (process.env.GROQ_API_KEY) {
       const buf = Buffer.from(audioBase64, 'base64');
-      const cleanMime = String(mimeType || 'audio/webm').split(';')[0];
-      const ext = cleanMime.includes('mp4') ? 'm4a' : cleanMime.includes('ogg') ? 'ogg' : cleanMime.includes('wav') ? 'wav' : 'webm';
+      const ext = (cleanMime.includes('mp4') || cleanMime.includes('m4a') || cleanMime.includes('aac')) ? 'm4a'
+        : (cleanMime.includes('mpeg') || cleanMime.includes('mp3')) ? 'mp3'
+        : (cleanMime.includes('ogg') || cleanMime.includes('opus')) ? 'ogg'
+        : cleanMime.includes('wav') ? 'wav'
+        : 'webm';
       const form = new FormData();
-      form.append('file', new Blob([buf], { type: cleanMime }), `speech.${ext}`);
+      form.append('file', new Blob([buf], { type: geminiMime }), `voicenote.${ext}`);
       form.append('model', 'whisper-large-v3-turbo');
 
       const groqRes = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {

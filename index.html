@@ -190,26 +190,29 @@ input[type=range]{accent-color:var(--ac);padding:0;height:30px;background:transp
   font-weight:800;font-size:18px;border:0;cursor:pointer;min-height:48px;font-family:var(--mono)
 }
 
-/* ===== UNIFIED DRAGGABLE BUBBLE FRIEND ===== */
+/* ===== UNIFIED DRAGGABLE WAVE BUDDY (CALCULATOR ICON AESTHETIC) ===== */
 #buddyBub{
-  position:fixed;z-index:3000;right:16px;bottom:16px;
+  position:fixed;z-index:3000;right:16px;bottom:18px;
   touch-action:none;user-select:none;
 }
 .buddy-orb{
-  width:60px;height:60px;border-radius:50%;
-  background:linear-gradient(135deg,#22d3ee,#a78bfa);
-  border:2.5px solid #fff;color:#070811;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  cursor:grab;box-shadow:0 10px 28px rgba(0,0,0,.55),0 0 0 4px rgba(167,139,250,.18);
+  width:64px;height:64px;border-radius:18px;
+  background:#070811;
+  border:2px solid rgba(34,211,238,.85);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:grab;box-shadow:0 12px 30px rgba(0,0,0,.65),0 0 18px rgba(167,139,250,.32),0 0 0 3px rgba(34,211,238,.14);
   transition:transform .15s ease,box-shadow .15s ease;
-  position:relative;
+  position:relative;overflow:visible;padding:2px;
 }
+.buddy-orb:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.72),0 0 22px rgba(34,211,238,.42)}
 .buddy-orb:active{cursor:grabbing;transform:scale(.95)}
-.buddy-orb .sym{font-size:24px;font-weight:900;line-height:1}
+.buddy-orb img{width:100%;height:100%;object-fit:cover;border-radius:14px;pointer-events:none;display:block}
 .buddy-orb .tag{
-  position:absolute;bottom:-7px;background:#070811;color:#fff;
-  font-size:9px;font-weight:800;letter-spacing:.05em;padding:2px 7px;
-  border-radius:999px;border:1px solid rgba(255,255,255,.7);pointer-events:none
+  position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);white-space:nowrap;
+  background:linear-gradient(90deg,#0b0d18,#141728);color:#f8fafc;
+  font-size:8.5px;font-weight:800;letter-spacing:.06em;padding:2px 7px;
+  border-radius:999px;border:1px solid rgba(34,211,238,.75);pointer-events:none;
+  box-shadow:0 4px 10px rgba(0,0,0,.5)
 }
 
 /* ===== BUBBLE FRIEND HUB (AI CHAT + CALC + RETURN + EXIT) ===== */
@@ -268,12 +271,12 @@ input[type=range]{accent-color:var(--ac);padding:0;height:30px;background:transp
 .msg.ai small{display:block;margin-top:4px;color:var(--muted);font-size:11px}
 .chat-form{display:flex;gap:6px;align-items:center}
 .chat-form input{flex:1;padding:9px 11px;font-size:13.5px;border-radius:10px;min-height:42px;min-width:0}
-.mic-btn{
+.mic-btn,.vn-btn{
   background:var(--card);color:var(--tx);border:1px solid var(--ln);border-radius:10px;
-  min-width:42px;height:42px;font-size:17px;cursor:pointer;flex:0 0 auto;
+  min-width:40px;height:42px;font-size:16px;cursor:pointer;flex:0 0 auto;
   display:inline-flex;align-items:center;justify-content:center;transition:all .15s ease
 }
-.mic-btn:hover{border-color:var(--cyan)}
+.mic-btn:hover,.vn-btn:hover{border-color:var(--cyan)}
 .mic-btn.recording{
   background:rgba(239,68,68,.22);border-color:var(--red);color:#fca5a5;
   box-shadow:0 0 0 3px rgba(239,68,68,.22)
@@ -504,19 +507,19 @@ body.is-minimized #buddyBub{display:block !important}
   </div>
 </div>
 
-<!-- MERGED DRAGGABLE WAVE BUDDY BUBBLE -->
+<!-- MERGED DRAGGABLE WAVE BUDDY (CALCULATOR ICON ORB) -->
 <div id="buddyBub">
-  <div class="buddy-orb" onclick="toggleBuddyHub()" role="button" tabindex="0" aria-label="Open Wave Buddy hub">
-    <span class="sym">🌊</span>
+  <div class="buddy-orb" onclick="toggleBuddyHub()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBuddyHub();}" role="button" tabindex="0" aria-label="Open Wave Buddy calculator menu">
+    <img src="/icon-192.png" alt="Wave Buddy">
     <span class="tag">WAVE BUDDY</span>
   </div>
 </div>
 
-<!-- UNIFIED WAVE BUDDY HUB (AI VOICE CHAT + CALCULATOR + RETURN + EXIT) -->
+<!-- UNIFIED WAVE BUDDY HUB (TALK TO AI + VOICE NOTE + CALCULATOR + RETURN + EXIT) -->
 <div id="buddyHub" role="dialog" aria-label="Wave Buddy Hub">
   <div class="hub-head">
     <div class="hub-title">
-      <strong>🌊 Wave Buddy</strong>
+      <strong><img src="/icon-192.png" alt="" style="width:18px;height:18px;border-radius:5px;object-fit:cover"> Wave Buddy</strong>
       <span id="hubTopic">Topic: Addition</span>
     </div>
     <div class="hub-head-btns">
@@ -528,7 +531,7 @@ body.is-minimized #buddyBub{display:block !important}
   <div class="hub-actions">
     <button class="hub-act active" id="hubAiBtn" onclick="focusHubChat()">
       <span class="ico">💬</span>
-      <span>AI Chat</span>
+      <span>Talk to AI</span>
     </button>
     <button class="hub-act" onclick="openCalcFromHub()">
       <span class="ico">🧮</span>
@@ -540,7 +543,7 @@ body.is-minimized #buddyBub{display:block !important}
     </button>
     <button class="hub-act ext" onclick="exitApp()">
       <span class="ico">✕</span>
-      <span>Exit</span>
+      <span>Exit App</span>
     </button>
   </div>
 
@@ -553,13 +556,15 @@ body.is-minimized #buddyBub{display:block !important}
       <button class="chip" onclick="clearChat()">Clear</button>
     </div>
     <div id="voiceStatus">
-      <span id="voiceStatusTxt">Listening... speak your math question</span>
+      <span id="voiceStatusTxt">Recording VN... tap Stop to transcribe</span>
       <button type="button" onclick="stopVoiceInput()" style="background:var(--red);color:#fff;border:0;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:800;cursor:pointer">Stop</button>
     </div>
     <div id="chatLog"></div>
     <form class="chat-form" onsubmit="event.preventDefault(); askBuddy();">
-      <button type="button" class="mic-btn" id="micBtn" onclick="toggleVoiceInput()" title="Speak to transcribe" aria-label="Voice input">🎙️</button>
-      <input id="cask" placeholder="Ask or tap mic to speak..." autocomplete="off">
+      <input type="file" id="vnFileInput" accept="audio/*,.ogg,.opus,.m4a,.mp3,.wav,.webm" style="display:none" onchange="handleVnFileSelect(this)">
+      <button type="button" class="mic-btn" id="micBtn" onclick="toggleVoiceInput()" title="Record Voice Note to transcribe to text" aria-label="Record voice note">🎙️</button>
+      <button type="button" class="vn-btn" onclick="triggerVnUpload()" title="Upload Voice Note audio file to transcribe to text" aria-label="Upload voice note file">📎</button>
+      <input id="cask" placeholder="Ask AI, record 🎙️ VN, or attach 📎 audio..." autocomplete="off">
       <button type="submit" class="chat-send">Send</button>
     </form>
   </div>
@@ -1146,6 +1151,11 @@ function collapseToWaveBuddy(){
   syncAndroidOverlayClass(true);
   $('buddyBub').style.display='block';
   clampElementToViewport($('buddyBub'));
+  try{
+    if(window.AndroidMinimize && typeof window.AndroidMinimize.minimize === 'function'){
+      window.AndroidMinimize.minimize();
+    }
+  }catch(e){}
 }
 
 function collapseToCalc(){
@@ -1161,6 +1171,12 @@ function collapseToCalc(){
 }
 
 function maxApp(){
+  try{
+    if(window.AndroidOverlay && typeof window.AndroidOverlay.returnToApp === 'function'){
+      window.AndroidOverlay.returnToApp();
+      return;
+    }
+  }catch(e){}
   $('exitScreen').classList.remove('open');
   document.body.classList.remove('is-minimized');
   document.documentElement.classList.remove('is-minimized');
@@ -1172,6 +1188,12 @@ function maxApp(){
 
 function exitApp(){
   stopVoiceInput();
+  try{
+    if(window.AndroidOverlay && typeof window.AndroidOverlay.exitOverlay === 'function'){
+      window.AndroidOverlay.exitOverlay();
+      return;
+    }
+  }catch(e){}
   $('buddyHub').classList.remove('open');
   $('fcalc').classList.remove('open');
   $('buddyBub').style.display='none';
@@ -1189,7 +1211,11 @@ function reopenFromExit(mode){
   $('exitScreen').classList.remove('open');
   $('buddyBub').style.display='block';
   if(mode==='buddy'){
-    collapseToWaveBuddy();
+    $('fcalc').classList.remove('open');
+    document.body.classList.add('is-minimized');
+    document.documentElement.classList.add('is-minimized');
+    syncAndroidOverlayClass(true);
+    clampElementToViewport($('buddyBub'));
     if(!chatHistory.length) initChatGreeting();
     positionHubNearBubble();
   } else {
@@ -1324,6 +1350,50 @@ function blobToBase64(blob){
   });
 }
 
+async function transcribeAudioBlob(blob, fallbackLiveText){
+  if(!blob || !blob.size){
+    setVoiceUi(false, '');
+    $('voiceStatus').classList.remove('on');
+    return;
+  }
+  setVoiceUi(false, 'Transcribing voice note to text...');
+  try{
+    const b64 = await blobToBase64(blob);
+    const r = await fetch('/api/transcribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ audioBase64: b64, mimeType: blob.type || 'audio/webm' })
+    });
+    const d = await r.json();
+    if(r.ok && d.text){
+      $('cask').value = d.text;
+      toast('Voice note transcribed ✓');
+    } else if(!fallbackLiveText && d.error){
+      toast(d.error);
+    }
+  }catch(e){
+    if(!fallbackLiveText) toast('Voice note transcription failed.');
+  }
+  setVoiceUi(false, '');
+  $('voiceStatus').classList.remove('on');
+  if($('cask').value.trim()) $('cask').focus();
+}
+
+function triggerVnUpload(){
+  const el = $('vnFileInput');
+  if(el){ el.value=''; el.click(); }
+}
+
+async function handleVnFileSelect(input){
+  const file = input && input.files && input.files[0];
+  if(!file) return;
+  if(file.size > 16 * 1024 * 1024){
+    toast('Voice note file must be under 16 MB.');
+    return;
+  }
+  await transcribeAudioBlob(file, '');
+}
+
 async function toggleVoiceInput(){
   if(isRecordingVoice){
     stopVoiceInput();
@@ -1364,28 +1434,13 @@ async function toggleVoiceInput(){
         const tracks = mediaStream ? mediaStream.getTracks() : [];
         tracks.forEach(tr=>tr.stop());
         mediaStream = null;
-        if(!audioChunks.length){ setVoiceUi(false, ''); return; }
-        const blob = new Blob(audioChunks, { type: mediaRec.mimeType || 'audio/webm' });
-        setVoiceUi(false, 'Transcribing audio...');
-        try{
-          const b64 = await blobToBase64(blob);
-          const r = await fetch('/api/transcribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ audioBase64: b64, mimeType: blob.type || 'audio/webm' })
-          });
-          const d = await r.json();
-          if(r.ok && d.text){
-            $('cask').value = d.text;
-          } else if(!speechLiveText && d.error){
-            toast(d.error);
-          }
-        }catch(e){
-          if(!speechLiveText) toast('Voice transcription failed.');
+        if(!audioChunks.length){
+          setVoiceUi(false, '');
+          $('voiceStatus').classList.remove('on');
+          return;
         }
-        setVoiceUi(false, '');
-        $('voiceStatus').classList.remove('on');
-        if($('cask').value.trim()) $('cask').focus();
+        const blob = new Blob(audioChunks, { type: mediaRec.mimeType || 'audio/webm' });
+        await transcribeAudioBlob(blob, speechLiveText);
       };
       mediaRec.start();
       startedAny = true;
@@ -1395,10 +1450,10 @@ async function toggleVoiceInput(){
   }
 
   if(!startedAny){
-    toast('Microphone permission or Speech API unavailable in this browser.');
+    toast('Mic blocked here — tap 📎 to upload a voice note file instead.');
     return;
   }
-  setVoiceUi(true, 'Listening... tap Stop when finished');
+  setVoiceUi(true, 'Recording VN... tap Stop to transcribe');
 }
 
 function stopVoiceInput(){
@@ -1732,7 +1787,13 @@ aeroUpdateBadge();
   if(openParam === 'calc' || openParam === 'waiter'){
     collapseToCalc();
   } else if(openParam === 'buddy'){
-    collapseToWaveBuddy();
+    $('exitScreen').classList.remove('open');
+    $('fcalc').classList.remove('open');
+    document.body.classList.add('is-minimized');
+    document.documentElement.classList.add('is-minimized');
+    syncAndroidOverlayClass(true);
+    $('buddyBub').style.display='block';
+    clampElementToViewport($('buddyBub'));
     initChatGreeting();
     positionHubNearBubble();
   }
